@@ -1,12 +1,34 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:moview_web/controller/movie_controller.dart';
 import 'package:moview_web/utill/default.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class HomeScreenDesktop extends StatelessWidget {
+class HomeScreenDesktop extends StatefulWidget {
+  @override
+  _HomeScreenDesktopState createState() => _HomeScreenDesktopState();
+}
+
+class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   int kHeaderFontSize;
+  final ItemScrollController itemScrollController = ItemScrollController();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
+  final controller = Get.put(MovieController());
+  int selectedIndex = 0;
+  @override
+  void initState() {
+    final controller = Get.put(MovieController());
+    controller.getMovie(controller);
+
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,7 +48,8 @@ class HomeScreenDesktop extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('assets/images/post.jpeg'),
+                        image: NetworkImage(
+                            controller.movieList[selectedIndex].image),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -101,7 +124,7 @@ class HomeScreenDesktop extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'THE STAR IS BORN ',
+                      controller.movieList[selectedIndex].title,
                       style: GoogleFonts.staatliches(
                         textStyle: TextStyle(
                           color: Colors.white,
@@ -121,7 +144,7 @@ class HomeScreenDesktop extends StatelessWidget {
                               borderRadius: BorderRadius.circular(3)),
                           child: Center(
                             child: Text(
-                              '15세 이상 관람과',
+                              '${controller.movieList[selectedIndex].rating}세 이상 관람과',
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
@@ -130,7 +153,7 @@ class HomeScreenDesktop extends StatelessWidget {
                           width: 14,
                         ),
                         Text(
-                          '2019',
+                          controller.movieList[selectedIndex].year,
                           style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ],
@@ -140,7 +163,7 @@ class HomeScreenDesktop extends StatelessWidget {
                       height: 24,
                     ),
                     Text(
-                      ' 제1차 세계 대전을 배경으로, 독일군의 함정에 빠진 아군을 구하기 위해 적진을 뚫고 달려가는 두 영국 병사가 하루 동안 겪는 사투를 그린 영화',
+                      controller.movieList[selectedIndex].description,
                       style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           letterSpacing: 1,
@@ -230,11 +253,14 @@ class HomeScreenDesktop extends StatelessWidget {
                                       size: 18,
                                     ),
                                     SizedBox(width: 5),
-                                    Text(
-                                      '관심목록에 추가',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white),
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Text(
+                                        '관심목록에 추가',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -252,12 +278,38 @@ class HomeScreenDesktop extends StatelessWidget {
           ),
         ),
         Positioned(
+          left: 61,
           bottom: 0,
           child: Container(
             margin: EdgeInsets.only(bottom: 40),
-            color: Colors.red,
             width: MediaQuery.of(context).size.width,
-            height: 300,
+            height: 345,
+            child: ScrollablePositionedList.builder(
+                scrollDirection: Axis.horizontal,
+                itemScrollController: itemScrollController,
+                itemPositionsListener: itemPositionsListener,
+                itemCount: controller.movieList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                      itemScrollController.scrollTo(
+                          index: 150,
+                          duration: Duration(seconds: 2),
+                          curve: Curves.easeInOut);
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(right: 20),
+                      width: 236,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Image.network(controller.movieList[index].image),
+                      ),
+                    ),
+                  );
+                }),
           ),
         ),
       ]),

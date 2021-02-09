@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -5,7 +6,9 @@ import 'package:moview_web/screens/home/home_screen.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
