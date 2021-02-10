@@ -316,15 +316,9 @@ class _MainScreenState extends State<MainScreen> {
                 ),
                 Scaffold(
                   body: Container(
-                    color: Colors.orange,
-                  ),
-                ),
-                Scaffold(
-                  body: Container(
                     color: Colors.amber,
                   ),
                 ),
-                Scaffold(),
                 Scaffold(
                   body: Container(
                     color: Colors.indigo,

@@ -11,11 +11,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveBuilder(
       builder: (context, size) {
-        Scaffold(
-          appBar: AppBar(
-            title: Text('hi'),
-          ),
-        );
         if (size.isMobile) {
           return HomeScreenMobile();
         }

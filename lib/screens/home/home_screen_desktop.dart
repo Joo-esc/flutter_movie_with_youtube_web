@@ -24,456 +24,340 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
       ItemPositionsListener.create();
   final controller = Get.put(MovieController());
   int selectedIndex = 0;
-  int selectedType = 0;
+  int selectedType;
+  bool sectionChange = true;
   @override
   void initState() {
     final controller = Get.put(MovieController());
     controller.getMovie(controller);
-    controller.getMovieA(controller);
-    controller.getMovieB(controller);
-    int selectedIndex = 1;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      child: Stack(children: [
-        // TODO Background  box(left) , image(right)
-        Row(
-          children: [
-            Container(
-              // width: 296,
-              width: MediaQuery.of(context).size.width * 0.205,
-              height: double.infinity,
-              color: kSidebarColor,
-            ),
-            Expanded(
-              child: Stack(
+    return StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('movies')
+            .where('type', isEqualTo: selectedType == 0 ? null : selectedType)
+            .snapshots(),
+        builder: (context, snapshot) {
+          return Container(
+            width: double.infinity,
+            child: Stack(children: [
+              // TODO Background  box(left) , image(right)
+              Row(
                 children: [
-                  Container(child: Builder(builder: (context) {
-                    if (selectedType == 0) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(
-                                controller.movieList[selectedIndex].image),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    } else if (selectedType == 1) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(
-                                controller.movieListA[selectedIndex].image),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    } else {
-                      return Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(
-                                controller.movieListB[selectedIndex].image),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    }
-                  })),
                   Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        gradient: LinearGradient(
-                            begin: FractionalOffset.centerRight,
-                            end: FractionalOffset.centerLeft,
-                            colors: [
-                              Color(0xFF1D1D1D).withOpacity(0.5),
-                              Color(0xFF1D1D1D),
-                            ],
-                            stops: [
-                              0.0,
-                              1.0
-                            ])),
-                  )
+                    width: 296,
+                    height: double.infinity,
+                    color: kSidebarColor,
+                  ),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: NetworkImage(snapshot
+                                  .data.docs[controller.count.value]
+                                  .data()['image']),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              gradient: LinearGradient(
+                                  begin: FractionalOffset.centerRight,
+                                  end: FractionalOffset.centerLeft,
+                                  colors: [
+                                    Color(0xFF1D1D1D).withOpacity(0.5),
+                                    Color(0xFF1D1D1D),
+                                  ],
+                                  stops: [
+                                    0.0,
+                                    1.0
+                                  ])),
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ],
-        ),
-        //TODO Section Container Layout
-        ConstrainedBox(
-          constraints: BoxConstraints(
-            minWidth: 660,
-            maxWidth: 662,
-            minHeight: 490,
-            maxHeight: 510,
-          ),
-          child: Container(
-            margin: EdgeInsets.only(left: 61, top: 73),
-            // color: Colors.grey.withOpacity(0.2),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //TODO Section 1 (Big Cateogry)
-                // Row(
-                //   children: [
-                //     Text(
-                //       '전체',
-                //       style: TextStyle(
-                //           fontSize: 26,
-                //           color: Colors.white,
-                //           fontWeight: FontWeight.w700),
-                //     ),
-                //     Container(
-                //       padding: EdgeInsets.symmetric(horizontal: 30),
-                //       child: Text(
-                //         '국내',
-                //         style: TextStyle(
-                //             fontSize: 26,
-                //             color: Color(0xFF616161),
-                //             fontWeight: FontWeight.w700),
-                //       ),
-                //     ),
-                //     Text(
-                //       '해외',
-                //       style: TextStyle(
-                //           fontSize: 26,
-                //           color: Color(0xFF616161),
-                //           fontWeight: FontWeight.w700),
-                //     ),
-                //   ],
-                // ),
-                GroupButton(
-                  isRadio: true,
-                  selectedTextStyle: TextStyle(
-                    fontSize: 26,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  unselectedTextStyle:
-                      TextStyle(fontSize: 26, color: Color(0xFF616161)),
-                  selectedBorderColor: Colors.transparent,
-                  unselectedBorderColor: Colors.transparent,
-                  selectedColor: Colors.transparent,
-                  unselectedColor: Colors.transparent,
-                  spacing: 6,
-                  onSelected: (index, isSelected) {
-                    setState(() {
-                      selectedType = index;
-                      selectedIndex = 0;
-                    });
-                    itemScrollController.scrollTo(
-                        index: 0,
-                        duration: Duration(seconds: 1),
-                        curve: Curves.easeInOutCubic);
-                  },
-                  buttons: ['전체', '해외', '국내'],
+              //TODO Section Container Layout
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: 660,
+                  maxWidth: 662,
+                  minHeight: 490,
+                  maxHeight: 510,
                 ),
-                SizedBox(height: 64),
-                //TODO Section 2 Title & information
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Builder(builder: (context) {
-                      if (selectedType == 0) {
-                        return Text(
-                          controller.movieList[selectedIndex].title,
-                          style: GoogleFonts.staatliches(
-                            textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 96,
-                            ),
-                          ),
-                        );
-                      } else if (selectedType == 1) {
-                        return Text(
-                          controller.movieListA[selectedIndex].title,
-                          style: GoogleFonts.staatliches(
-                            textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 96,
-                            ),
-                          ),
-                        );
-                      } else {
-                        return Text(
-                          controller.movieListB[selectedIndex].title,
-                          style: GoogleFonts.staatliches(
-                            textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 96,
-                            ),
-                          ),
-                        );
-                      }
-                    }),
-                    SizedBox(height: 14),
-                    //TODO ==> (개봉연도, 관람가)
-                    Row(
-                      children: [
-                        Container(
-                          height: 27,
-                          width: 110,
-                          decoration: BoxDecoration(
-                              color: Color(0xFF6E6E6E),
-                              borderRadius: BorderRadius.circular(3)),
-                          child: Center(
-                            child: Builder(builder: (context) {
-                              if (selectedType == 0) {
-                                return Text(
-                                  '${controller.movieList[selectedIndex].rating}세 이상 관람과',
-                                  style: TextStyle(color: Colors.white),
-                                );
-                              } else if (selectedType == 1) {
-                                return Text(
-                                  '${controller.movieListA[selectedIndex].rating}세 이상 관람과',
-                                  style: TextStyle(color: Colors.white),
-                                );
-                              } else {
-                                return Text(
-                                  '${controller.movieListB[selectedIndex].rating}세 이상 관람과',
-                                  style: TextStyle(color: Colors.white),
-                                );
-                              }
-                            }),
-                          ),
+                child: Container(
+                  margin: EdgeInsets.only(left: 61, top: 73),
+                  // color: Colors.grey.withOpacity(0.2),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      //TODO Section 1 (Big Cateogry)
+                      GroupButton(
+                        isRadio: true,
+                        selectedTextStyle: TextStyle(
+                          fontSize: 26,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
                         ),
-                        SizedBox(
-                          width: 14,
-                        ),
-                        Builder(builder: (context) {
-                          if (selectedType == 0) {
-                            return Text(
-                              controller.movieList[selectedIndex].year,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
-                            );
-                          } else if (selectedType == 1) {
-                            return Text(
-                              controller.movieListA[selectedIndex].year,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
-                            );
-                          } else {
-                            return Text(
-                              controller.movieListB[selectedIndex].year,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16),
-                            );
-                          }
-                        }),
-                      ],
-                    ),
-                    //TODO About Descritption
-                    SizedBox(
-                      height: 24,
-                    ),
-                    Builder(builder: (context) {
-                      if (selectedType == 0) {
-                        return Text(
-                          controller.movieList[selectedIndex].description,
-                          style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              letterSpacing: 1,
-                              wordSpacing: 0.8,
-                              height: 1.4),
-                        );
-                      } else if (selectedType == 1) {
-                        return Text(
-                          controller.movieListA[selectedIndex].description,
-                          style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              letterSpacing: 1,
-                              wordSpacing: 0.8,
-                              height: 1.4),
-                        );
-                      } else {
-                        return Text(
-                          controller.movieListB[selectedIndex].description,
-                          style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              letterSpacing: 1,
-                              wordSpacing: 0.8,
-                              height: 1.4),
-                        );
-                      }
-                    }),
-
-                    SizedBox(
-                      height: 30,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        //TODO 리뷰영상
-                        Container(
-                          width: 156,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3),
-                            color: Color(0xFFFFE24B),
+                        unselectedTextStyle:
+                            TextStyle(fontSize: 26, color: Color(0xFF616161)),
+                        selectedBorderColor: Colors.transparent,
+                        unselectedBorderColor: Colors.transparent,
+                        selectedColor: Colors.transparent,
+                        unselectedColor: Colors.transparent,
+                        spacing: 6,
+                        onSelected: (index, isSelected) {
+                          setState(() {
+                            controller.count.value = 0;
+                            selectedType = index;
+                          });
+                          itemScrollController.scrollTo(
+                              index: 0,
+                              duration: Duration(seconds: 1),
+                              curve: Curves.easeInOutCubic);
+                        },
+                        buttons: ['전체', '해외', '국내'],
+                      ),
+                      SizedBox(height: 64),
+                      //TODO Section 2 Title & information
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            snapshot.data.docs[controller.count.value]
+                                .data()['title'],
+                            style: GoogleFonts.staatliches(
+                              textStyle: TextStyle(
+                                color: Colors.white,
+                                fontSize: 96,
+                              ),
+                            ),
                           ),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  FontAwesomeIcons.youtube,
-                                  size: 18,
-                                ),
-                                SizedBox(width: 5),
-                                GestureDetector(
-                                  onTap: () {
-                                    Get.to(HomeDetailDesktop(),
-                                        transition: Transition.fadeIn);
-                                  },
+                          SizedBox(height: 14),
+                          //TODO ==> (개봉연도, 관람가)
+                          Row(
+                            children: [
+                              Container(
+                                height: 27,
+                                width: 110,
+                                decoration: BoxDecoration(
+                                    color: Color(0xFF6E6E6E),
+                                    borderRadius: BorderRadius.circular(3)),
+                                child: Center(
                                   child: Text(
-                                    'Youtube 리뷰 영상',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w700),
+                                    '${snapshot.data.docs[controller.count.value].data()['rating']}세이상 관람가',
+                                    style: TextStyle(color: Colors.white),
                                   ),
                                 ),
-                                SizedBox(width: 6),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              width: 86,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(width: 0.5, color: Colors.white),
-                                borderRadius: BorderRadius.circular(3),
-                                color: Colors.transparent,
                               ),
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.play_circle_outline,
-                                      color: Colors.white,
-                                      size: 18,
-                                    ),
-                                    SizedBox(width: 5),
-                                    Text(
-                                      '예고편',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white),
-                                    ),
-                                  ],
+                              SizedBox(
+                                width: 14,
+                              ),
+                              Text(
+                                snapshot.data.docs[controller.count.value]
+                                    .data()['year'],
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          //TODO About Descritption
+                          SizedBox(
+                            height: 24,
+                          ),
+                          Text(
+                            snapshot.data.docs[controller.count.value]
+                                .data()['description'],
+                            style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                letterSpacing: 1,
+                                wordSpacing: 0.8,
+                                height: 1.4),
+                          ),
+                          SizedBox(
+                            height: 30,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              //TODO 리뷰영상
+                              Container(
+                                width: 156,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(3),
+                                  color: Color(0xFFFFE24B),
+                                ),
+                                child: Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        FontAwesomeIcons.youtube,
+                                        size: 18,
+                                      ),
+                                      SizedBox(width: 5),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            sectionChange = false;
+                                          });
+                                          print(sectionChange);
+                                        },
+                                        child: Text(
+                                          'Youtube 리뷰 영상',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                      SizedBox(width: 6),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 10),
-                            Container(
-                              width: 136,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                border:
-                                    Border.all(width: 0.5, color: Colors.white),
-                                borderRadius: BorderRadius.circular(3),
-                                color: Colors.transparent,
-                              ),
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.play_circle_outline,
-                                      color: Colors.white,
-                                      size: 18,
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 86,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 0.5, color: Colors.white),
+                                      borderRadius: BorderRadius.circular(3),
+                                      color: Colors.transparent,
                                     ),
-                                    SizedBox(width: 5),
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Text(
-                                        '관심목록에 추가',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white),
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.play_circle_outline,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                          SizedBox(width: 5),
+                                          Text(
+                                            '예고편',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.white),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Container(
+                                    width: 136,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 0.5, color: Colors.white),
+                                      borderRadius: BorderRadius.circular(3),
+                                      color: Colors.transparent,
+                                    ),
+                                    child: Center(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.play_circle_outline,
+                                            color: Colors.white,
+                                            size: 18,
+                                          ),
+                                          SizedBox(width: 5),
+                                          GestureDetector(
+                                            onTap: () {},
+                                            child: Text(
+                                              '관심목록에 추가',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                //TODO SWIPER
-              ],
-            ),
-          ),
-        ),
-        Positioned(
-          left: 61,
-          bottom: 0,
-          child: Container(
-            margin: EdgeInsets.only(bottom: 40),
-            width: MediaQuery.of(context).size.width,
-            height: 345,
-            // height: MediaQuery.of(context).size.height * 0.39,
-            child: ScrollablePositionedList.builder(
-                scrollDirection: Axis.horizontal,
-                itemScrollController: itemScrollController,
-                itemPositionsListener: itemPositionsListener,
-                itemCount: controller.movieList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        controller.count.value = index;
-                        selectedIndex = index;
-                      });
-                      itemScrollController.scrollTo(
-                          index: selectedIndex,
-                          duration: Duration(seconds: 1),
-                          curve: Curves.easeInOutCubic);
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(right: 20),
-                      width: 236,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Builder(builder: (context) {
-                          if (selectedType == 0) {
-                            return Image.network(
-                              controller.movieList[index].image,
-                              fit: BoxFit.cover,
-                            );
-                          } else if (selectedType == 1) {
-                            return Image.network(
-                              controller.movieListA[index].image,
-                              fit: BoxFit.cover,
-                            );
-                          } else {
-                            return Image.network(
-                              controller.movieListB[index].image,
-                              fit: BoxFit.cover,
-                            );
-                          }
-                        }),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                  );
-                }),
-          ),
-        ),
-      ]),
-    );
+                      //TODO SWIPER
+                    ],
+                  ),
+                ),
+              ),
+              sectionChange
+                  ? Positioned(
+                      left: 61,
+                      bottom: 0,
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 40),
+                        width: MediaQuery.of(context).size.width,
+                        height: 345,
+                        child: ScrollablePositionedList.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemScrollController: itemScrollController,
+                            itemPositionsListener: itemPositionsListener,
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {});
+                                  controller.count.value = index;
+                                  itemScrollController.scrollTo(
+                                      index: controller.count.value,
+                                      duration: Duration(seconds: 1),
+                                      curve: Curves.easeInOutCubic);
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 20),
+                                  width: 236,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.network(snapshot
+                                        .data.docs[index]
+                                        .data()['image']),
+                                  ),
+                                ),
+                              );
+                            }),
+                      ),
+                    )
+                  //TODO SECTION CHANGE TO DETAIL SCREEN
+                  : Positioned(
+                      left: 61,
+                      bottom: 0,
+                      child: Container(
+                        margin: EdgeInsets.only(bottom: 40),
+                        width: MediaQuery.of(context).size.width,
+                        height: 345,
+                        child: ListView.builder(
+                          itemCount: 10,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Center(
+                              child: Text('$index'),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+            ]),
+          );
+        });
   }
 }
