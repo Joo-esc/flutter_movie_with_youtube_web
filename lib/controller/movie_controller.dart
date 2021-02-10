@@ -6,6 +6,24 @@ class MovieController extends GetxController {
   List<Movie> _movieList = [];
   List<Movie> get movieList => _movieList;
 
+  List<Movie> _movieListB = [];
+
+  List<Movie> get movieListB => _movieListB;
+
+  set movieListB(List<Movie> value) {
+    update();
+    _movieListB = value;
+  }
+
+  List<Movie> _movieListA = [];
+
+  List<Movie> get movieListA => _movieListA;
+
+  set movieListA(List<Movie> value) {
+    update();
+    _movieListA = value;
+  }
+
   RxInt count = 0.obs;
 
   set movieList(List<Movie> value) {
@@ -26,6 +44,38 @@ class MovieController extends GetxController {
     });
 
     movieController._movieList = _movieLista;
+  }
+
+  getMovieA(MovieController movieController) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('movies')
+        .where('type', isEqualTo: '해외')
+        .get();
+
+    List<Movie> _movieLista = [];
+
+    snapshot.docs.forEach((document) {
+      Movie movie = Movie.fromMap(document.data());
+      _movieLista.add(movie);
+    });
+
+    movieController._movieListA = _movieLista;
+  }
+
+  getMovieB(MovieController movieController) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('movies')
+        .where('type', isEqualTo: '국내')
+        .get();
+
+    List<Movie> _movieLista = [];
+
+    snapshot.docs.forEach((document) {
+      Movie movie = Movie.fromMap(document.data());
+      _movieLista.add(movie);
+    });
+
+    movieController._movieListB = _movieLista;
   }
 }
 

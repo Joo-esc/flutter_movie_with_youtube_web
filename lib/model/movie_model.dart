@@ -5,7 +5,7 @@ class Movie {
   String title;
   int likes;
   String year;
-
+  // HomeDetailDesktop
   Movie(this.image, this.description, this.rating, this.likes);
 
   Movie.fromMap(Map<String, dynamic> data) {

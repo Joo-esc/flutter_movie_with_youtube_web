@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 
 import 'package:moview_web/screens/home/home_screen.dart';
 import 'package:moview_web/utill/default.dart';
@@ -16,9 +17,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Free With Flutter - 플러터를 자유롭게',
+      title: 'Sub Project',
       theme: ThemeData(
         iconTheme: IconThemeData(
           color: Colors.black,

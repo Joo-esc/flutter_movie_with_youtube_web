@@ -5,9 +5,12 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:group_button/group_button.dart';
 import 'package:moview_web/controller/movie_controller.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+import 'detail/home_detail_desktop.dart';
 
 class HomeScreenDesktop extends StatefulWidget {
   @override
@@ -21,11 +24,14 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
       ItemPositionsListener.create();
   final controller = Get.put(MovieController());
   int selectedIndex = 0;
+  int selectedType = 0;
   @override
   void initState() {
     final controller = Get.put(MovieController());
     controller.getMovie(controller);
-
+    controller.getMovieA(controller);
+    controller.getMovieB(controller);
+    int selectedIndex = 1;
     super.initState();
   }
 
@@ -38,22 +44,47 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
         Row(
           children: [
             Container(
-              width: 296,
+              // width: 296,
+              width: MediaQuery.of(context).size.width * 0.205,
               height: double.infinity,
               color: kSidebarColor,
             ),
             Expanded(
               child: Stack(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(
-                            controller.movieList[selectedIndex].image),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
+                  Container(child: Builder(builder: (context) {
+                    if (selectedType == 0) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(
+                                controller.movieList[selectedIndex].image),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    } else if (selectedType == 1) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(
+                                controller.movieListA[selectedIndex].image),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    } else {
+                      return Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(
+                                controller.movieListB[selectedIndex].image),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    }
+                  })),
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -90,48 +121,98 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 //TODO Section 1 (Big Cateogry)
-                Row(
-                  children: [
-                    Text(
-                      '전체',
-                      style: TextStyle(
-                          fontSize: 26,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30),
-                      child: Text(
-                        '국내',
-                        style: TextStyle(
-                            fontSize: 26,
-                            color: Color(0xFF616161),
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    Text(
-                      '해외',
-                      style: TextStyle(
-                          fontSize: 26,
-                          color: Color(0xFF616161),
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ],
+                // Row(
+                //   children: [
+                //     Text(
+                //       '전체',
+                //       style: TextStyle(
+                //           fontSize: 26,
+                //           color: Colors.white,
+                //           fontWeight: FontWeight.w700),
+                //     ),
+                //     Container(
+                //       padding: EdgeInsets.symmetric(horizontal: 30),
+                //       child: Text(
+                //         '국내',
+                //         style: TextStyle(
+                //             fontSize: 26,
+                //             color: Color(0xFF616161),
+                //             fontWeight: FontWeight.w700),
+                //       ),
+                //     ),
+                //     Text(
+                //       '해외',
+                //       style: TextStyle(
+                //           fontSize: 26,
+                //           color: Color(0xFF616161),
+                //           fontWeight: FontWeight.w700),
+                //     ),
+                //   ],
+                // ),
+                GroupButton(
+                  isRadio: true,
+                  selectedTextStyle: TextStyle(
+                    fontSize: 26,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  unselectedTextStyle:
+                      TextStyle(fontSize: 26, color: Color(0xFF616161)),
+                  selectedBorderColor: Colors.transparent,
+                  unselectedBorderColor: Colors.transparent,
+                  selectedColor: Colors.transparent,
+                  unselectedColor: Colors.transparent,
+                  spacing: 6,
+                  onSelected: (index, isSelected) {
+                    setState(() {
+                      selectedType = index;
+                      selectedIndex = 0;
+                    });
+                    itemScrollController.scrollTo(
+                        index: 0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOutCubic);
+                  },
+                  buttons: ['전체', '해외', '국내'],
                 ),
                 SizedBox(height: 64),
                 //TODO Section 2 Title & information
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      controller.movieList[selectedIndex].title,
-                      style: GoogleFonts.staatliches(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 96,
-                        ),
-                      ),
-                    ),
+                    Builder(builder: (context) {
+                      if (selectedType == 0) {
+                        return Text(
+                          controller.movieList[selectedIndex].title,
+                          style: GoogleFonts.staatliches(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 96,
+                            ),
+                          ),
+                        );
+                      } else if (selectedType == 1) {
+                        return Text(
+                          controller.movieListA[selectedIndex].title,
+                          style: GoogleFonts.staatliches(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 96,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Text(
+                          controller.movieListB[selectedIndex].title,
+                          style: GoogleFonts.staatliches(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 96,
+                            ),
+                          ),
+                        );
+                      }
+                    }),
                     SizedBox(height: 14),
                     //TODO ==> (개봉연도, 관람가)
                     Row(
@@ -143,33 +224,87 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                               color: Color(0xFF6E6E6E),
                               borderRadius: BorderRadius.circular(3)),
                           child: Center(
-                            child: Text(
-                              '${controller.movieList[selectedIndex].rating}세 이상 관람과',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            child: Builder(builder: (context) {
+                              if (selectedType == 0) {
+                                return Text(
+                                  '${controller.movieList[selectedIndex].rating}세 이상 관람과',
+                                  style: TextStyle(color: Colors.white),
+                                );
+                              } else if (selectedType == 1) {
+                                return Text(
+                                  '${controller.movieListA[selectedIndex].rating}세 이상 관람과',
+                                  style: TextStyle(color: Colors.white),
+                                );
+                              } else {
+                                return Text(
+                                  '${controller.movieListB[selectedIndex].rating}세 이상 관람과',
+                                  style: TextStyle(color: Colors.white),
+                                );
+                              }
+                            }),
                           ),
                         ),
                         SizedBox(
                           width: 14,
                         ),
-                        Text(
-                          controller.movieList[selectedIndex].year,
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
+                        Builder(builder: (context) {
+                          if (selectedType == 0) {
+                            return Text(
+                              controller.movieList[selectedIndex].year,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            );
+                          } else if (selectedType == 1) {
+                            return Text(
+                              controller.movieListA[selectedIndex].year,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            );
+                          } else {
+                            return Text(
+                              controller.movieListB[selectedIndex].year,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            );
+                          }
+                        }),
                       ],
                     ),
                     //TODO About Descritption
                     SizedBox(
                       height: 24,
                     ),
-                    Text(
-                      controller.movieList[selectedIndex].description,
-                      style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          letterSpacing: 1,
-                          wordSpacing: 0.8,
-                          height: 1.4),
-                    ),
+                    Builder(builder: (context) {
+                      if (selectedType == 0) {
+                        return Text(
+                          controller.movieList[selectedIndex].description,
+                          style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              letterSpacing: 1,
+                              wordSpacing: 0.8,
+                              height: 1.4),
+                        );
+                      } else if (selectedType == 1) {
+                        return Text(
+                          controller.movieListA[selectedIndex].description,
+                          style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              letterSpacing: 1,
+                              wordSpacing: 0.8,
+                              height: 1.4),
+                        );
+                      } else {
+                        return Text(
+                          controller.movieListB[selectedIndex].description,
+                          style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              letterSpacing: 1,
+                              wordSpacing: 0.8,
+                              height: 1.4),
+                        );
+                      }
+                    }),
+
                     SizedBox(
                       height: 30,
                     ),
@@ -193,9 +328,16 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                   size: 18,
                                 ),
                                 SizedBox(width: 5),
-                                Text(
-                                  'Youtube 리뷰 영상',
-                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.to(HomeDetailDesktop(),
+                                        transition: Transition.fadeIn);
+                                  },
+                                  child: Text(
+                                    'Youtube 리뷰 영상',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700),
+                                  ),
                                 ),
                                 SizedBox(width: 6),
                               ],
@@ -284,6 +426,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
             margin: EdgeInsets.only(bottom: 40),
             width: MediaQuery.of(context).size.width,
             height: 345,
+            // height: MediaQuery.of(context).size.height * 0.39,
             child: ScrollablePositionedList.builder(
                 scrollDirection: Axis.horizontal,
                 itemScrollController: itemScrollController,
@@ -293,19 +436,37 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                   return GestureDetector(
                     onTap: () {
                       setState(() {
+                        controller.count.value = index;
                         selectedIndex = index;
                       });
                       itemScrollController.scrollTo(
-                          index: 150,
-                          duration: Duration(seconds: 2),
-                          curve: Curves.easeInOut);
+                          index: selectedIndex,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOutCubic);
                     },
                     child: Container(
                       margin: EdgeInsets.only(right: 20),
                       width: 236,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.network(controller.movieList[index].image),
+                        child: Builder(builder: (context) {
+                          if (selectedType == 0) {
+                            return Image.network(
+                              controller.movieList[index].image,
+                              fit: BoxFit.cover,
+                            );
+                          } else if (selectedType == 1) {
+                            return Image.network(
+                              controller.movieListA[index].image,
+                              fit: BoxFit.cover,
+                            );
+                          } else {
+                            return Image.network(
+                              controller.movieListB[index].image,
+                              fit: BoxFit.cover,
+                            );
+                          }
+                        }),
                       ),
                     ),
                   );
