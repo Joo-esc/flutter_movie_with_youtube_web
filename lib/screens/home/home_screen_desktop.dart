@@ -1,7 +1,5 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,8 +7,7 @@ import 'package:group_button/group_button.dart';
 import 'package:moview_web/controller/movie_controller.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
-import 'detail/home_detail_desktop.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class HomeScreenDesktop extends StatefulWidget {
   @override
@@ -18,6 +15,8 @@ class HomeScreenDesktop extends StatefulWidget {
 }
 
 class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
+  //Youtube controller
+  YoutubePlayerController _controller;
   int kHeaderFontSize;
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
@@ -26,11 +25,22 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   int selectedIndex = 0;
   int selectedType;
   bool sectionChange = true;
+
+  List<String> youtubeId = [
+    'nPt8bK2gbaU',
+    'K18cpp_-gP8',
+    'iLnmTe5Q2Qw',
+    '_WoCV4c6XOE',
+    'KmzdUe0RSJo',
+    '6jZDSSZZxjQ',
+  ];
   @override
   void initState() {
     final controller = Get.put(MovieController());
     controller.getMovie(controller);
     super.initState();
+
+    YoutubePlayerController _controller;
   }
 
   @override
@@ -92,7 +102,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                   minWidth: 660,
                   maxWidth: 662,
                   minHeight: 490,
-                  maxHeight: 510,
+                  maxHeight: double.infinity,
                 ),
                 child: Container(
                   margin: EdgeInsets.only(left: 61, top: 73),
@@ -101,32 +111,45 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       //TODO Section 1 (Big Cateogry)
-                      GroupButton(
-                        isRadio: true,
-                        selectedTextStyle: TextStyle(
-                          fontSize: 26,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        unselectedTextStyle:
-                            TextStyle(fontSize: 26, color: Color(0xFF616161)),
-                        selectedBorderColor: Colors.transparent,
-                        unselectedBorderColor: Colors.transparent,
-                        selectedColor: Colors.transparent,
-                        unselectedColor: Colors.transparent,
-                        spacing: 6,
-                        onSelected: (index, isSelected) {
-                          setState(() {
-                            controller.count.value = 0;
-                            selectedType = index;
-                          });
-                          itemScrollController.scrollTo(
-                              index: 0,
-                              duration: Duration(seconds: 1),
-                              curve: Curves.easeInOutCubic);
-                        },
-                        buttons: ['전체', '해외', '국내'],
-                      ),
+                      sectionChange
+                          ? GroupButton(
+                              isRadio: true,
+                              selectedTextStyle: TextStyle(
+                                fontSize: 26,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              unselectedTextStyle: TextStyle(
+                                  fontSize: 26, color: Color(0xFF616161)),
+                              selectedBorderColor: Colors.transparent,
+                              unselectedBorderColor: Colors.transparent,
+                              selectedColor: Colors.transparent,
+                              unselectedColor: Colors.transparent,
+                              spacing: 6,
+                              onSelected: (index, isSelected) {
+                                setState(() {
+                                  controller.count.value = 0;
+                                  selectedType = index;
+                                });
+                                itemScrollController.scrollTo(
+                                    index: 0,
+                                    duration: Duration(seconds: 1),
+                                    curve: Curves.easeInOutCubic);
+                              },
+                              buttons: ['전체', '해외', '국내'],
+                            )
+                          : GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  sectionChange = true;
+                                });
+                              },
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                                size: 40,
+                              ),
+                            ),
                       SizedBox(height: 64),
                       //TODO Section 2 Title & information
                       Column(
@@ -186,114 +209,136 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                           SizedBox(
                             height: 30,
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              //TODO 리뷰영상
-                              Container(
-                                width: 156,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(3),
-                                  color: Color(0xFFFFE24B),
-                                ),
-                                child: Center(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        FontAwesomeIcons.youtube,
-                                        size: 18,
+                          sectionChange
+                              ? Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    //TODO 리뷰영상
+                                    Container(
+                                      width: 156,
+                                      height: 36,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(3),
+                                        color: Color(0xFFFFE24B),
                                       ),
-                                      SizedBox(width: 5),
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            sectionChange = false;
-                                          });
-                                          print(sectionChange);
-                                        },
-                                        child: Text(
-                                          'Youtube 리뷰 영상',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w700),
+                                      child: Center(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              FontAwesomeIcons.youtube,
+                                              size: 18,
+                                            ),
+                                            SizedBox(width: 5),
+                                            GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  sectionChange = false;
+                                                });
+                                                print(sectionChange);
+                                              },
+                                              child: Text(
+                                                'Youtube 리뷰 영상',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w700),
+                                              ),
+                                            ),
+                                            SizedBox(width: 6),
+                                          ],
                                         ),
                                       ),
-                                      SizedBox(width: 6),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 86,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 0.5, color: Colors.white),
-                                      borderRadius: BorderRadius.circular(3),
-                                      color: Colors.transparent,
                                     ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.play_circle_outline,
-                                            color: Colors.white,
-                                            size: 18,
-                                          ),
-                                          SizedBox(width: 5),
-                                          Text(
-                                            '예고편',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w500,
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: 86,
+                                          height: 36,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 0.5,
                                                 color: Colors.white),
+                                            borderRadius:
+                                                BorderRadius.circular(3),
+                                            color: Colors.transparent,
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Container(
-                                    width: 136,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 0.5, color: Colors.white),
-                                      borderRadius: BorderRadius.circular(3),
-                                      color: Colors.transparent,
-                                    ),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.play_circle_outline,
-                                            color: Colors.white,
-                                            size: 18,
-                                          ),
-                                          SizedBox(width: 5),
-                                          GestureDetector(
-                                            onTap: () {},
-                                            child: Text(
-                                              '관심목록에 추가',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.white),
+                                          child: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.play_circle_outline,
+                                                  color: Colors.white,
+                                                  size: 18,
+                                                ),
+                                                SizedBox(width: 5),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    print('hi');
+                                                  },
+                                                  child: Text(
+                                                    '예고편',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Container(
+                                          width: 136,
+                                          height: 36,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 0.5,
+                                                color: Colors.white),
+                                            borderRadius:
+                                                BorderRadius.circular(3),
+                                            color: Colors.transparent,
+                                          ),
+                                          child: Center(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  Icons.play_circle_outline,
+                                                  color: Colors.white,
+                                                  size: 18,
+                                                ),
+                                                SizedBox(width: 5),
+                                                GestureDetector(
+                                                  onTap: () {},
+                                                  child: Text(
+                                                    '관심목록에 추가',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                  ],
+                                )
+                              : Container(
+                                  margin: EdgeInsets.only(top: 20),
+                                  color: Colors.black87.withOpacity(0.1),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  height: 500,
+                                ),
                         ],
                       ),
                       //TODO SWIPER
@@ -301,6 +346,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                   ),
                 ),
               ),
+              //sectionChange
               sectionChange
                   ? Positioned(
                       left: 61,
@@ -324,6 +370,16 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                       duration: Duration(seconds: 1),
                                       curve: Curves.easeInOutCubic);
                                 },
+                                onDoubleTap: () {
+                                  setState(() {
+                                    sectionChange = false;
+                                  });
+                                  controller.count.value = index;
+                                  itemScrollController.scrollTo(
+                                      index: controller.count.value,
+                                      duration: Duration(seconds: 1),
+                                      curve: Curves.easeInOutCubic);
+                                },
                                 child: Container(
                                   margin: EdgeInsets.only(right: 20),
                                   width: 236,
@@ -338,23 +394,97 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                             }),
                       ),
                     )
-                  //TODO SECTION CHANGE TO DETAIL SCREEN
+                  //TODO |||| SECTION CHANGE TO DETAIL SCREEN |||
                   : Positioned(
-                      left: 61,
-                      bottom: 0,
+                      right: 0,
                       child: Container(
-                        margin: EdgeInsets.only(bottom: 40),
-                        width: MediaQuery.of(context).size.width,
-                        height: 345,
-                        child: ListView.builder(
-                          itemCount: 10,
-                          itemBuilder: (BuildContext context, int index) {
-                            return Center(
-                              child: Text('$index'),
-                            );
-                          },
-                        ),
-                      ),
+                          margin: EdgeInsets.only(bottom: 40),
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          height: MediaQuery.of(context).size.height,
+                          child: ListWheelScrollView.useDelegate(
+                            itemExtent: 400,
+                            diameterRatio: 6,
+                            childDelegate: ListWheelChildBuilderDelegate(
+                                builder: (BuildContext context, int index) {
+                              if (index < 0 || index > 1) {
+                                return null;
+                              }
+                              _controller = YoutubePlayerController(
+                                initialVideoId: snapshot
+                                    .data.docs[controller.count.value]
+                                    .data()['youtubeLink'][index],
+                                params: YoutubePlayerParams(
+                                  // Defining custom playlist
+                                  startAt: Duration(seconds: 1),
+                                  showControls: true,
+                                  showFullscreenButton: true,
+                                ),
+                              );
+
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 40),
+                                width: 500,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    YoutubePlayerControllerProvider(
+                                      // Provides controller to all the widget below it.
+                                      controller: _controller,
+                                      child: YoutubePlayerIFrame(
+                                        aspectRatio: 16 / 9,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          '기생충 스포일러 리뷰 및 해석',
+                                          style: TextStyle(
+                                              fontSize: 22,
+                                              color: Colors.white),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.thumb_up_alt_outlined,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(
+                                              width: 6,
+                                            ),
+                                            Text(
+                                              '263',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            SizedBox(
+                                              width: 20,
+                                            ),
+                                            Icon(
+                                              Icons.thumb_down_alt_outlined,
+                                              color: Colors.white,
+                                            ),
+                                            SizedBox(
+                                              width: 6,
+                                            ),
+                                            Text(
+                                              '12',
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              );
+                            }),
+                          )),
                     )
             ]),
           );
