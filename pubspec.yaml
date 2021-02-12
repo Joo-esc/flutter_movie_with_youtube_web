@@ -40,7 +40,7 @@ dependencies:
   firebase_auth: ^0.20.0+1
   group_button: ^1.1.0
   youtube_player_iframe: ^1.2.0+2
-
+  google_sign_in: ^4.5.9
 
 dev_dependencies:
   flutter_test:

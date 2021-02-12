@@ -7,6 +7,8 @@ import 'package:moview_web/screens/home/home_screen.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
+import 'screens/login/login_main_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -25,7 +27,7 @@ class MyApp extends StatelessWidget {
           color: Colors.black,
         ),
       ),
-      home: MainScreen(),
+      home: LoginMain(), //TODO After login screen use MainScreen
     );
   }
 }

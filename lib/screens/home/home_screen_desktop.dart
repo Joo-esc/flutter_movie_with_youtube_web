@@ -406,7 +406,12 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                             diameterRatio: 6,
                             childDelegate: ListWheelChildBuilderDelegate(
                                 builder: (BuildContext context, int index) {
-                              if (index < 0 || index > 1) {
+                              if (index < 0 ||
+                                  index >
+                                      snapshot.data.docs[controller.count.value]
+                                              .data()['youtubeLink']
+                                              .length -
+                                          1) {
                                 return null;
                               }
                               _controller = YoutubePlayerController(
