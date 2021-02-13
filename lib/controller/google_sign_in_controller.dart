@@ -21,6 +21,18 @@ class GoogleSignInController extends GetxController {
     _isSignIn = true;
     if (_user == null) {
       return _isSignIn = false;
-    } else {}
+    } else {
+      final googleAuth = await _user.authentication;
+      final crendential = await GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+
+      await FirebaseAuth.instance.signInWithCredential(crendential);
+      isSignIn = false;
+    }
+  }
+
+  void logout() async {
+    await googleSignIn.disconnect();
+    FirebaseAuth.instance.signOut();
   }
 }

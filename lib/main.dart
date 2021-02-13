@@ -2,12 +2,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:moview_web/screens/home/home_screen.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 
 import 'screens/login/login_main_screen.dart';
+
+GoogleSignIn _googleSignIn = GoogleSignIn(
+  scopes: [
+    'email',
+    'https://www.googleapis.com/auth/contacts.readonly',
+  ],
+);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
