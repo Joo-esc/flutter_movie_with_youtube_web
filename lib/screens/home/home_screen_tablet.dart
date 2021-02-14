@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:moview_web/controller/movie_controller.dart';
 import 'package:moview_web/utill/default.dart';
+import 'package:http/http.dart' as http;
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class HomeScreenTablet extends StatefulWidget {
@@ -21,12 +24,27 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
       ItemPositionsListener.create();
   final controller = Get.put(MovieController());
   int selectedIndex = 0;
+  var parsedData;
   @override
   void initState() {
     final controller = Get.put(MovieController());
     controller.getMovie(controller);
     int selectedIndex = 1;
+    Future.delayed(Duration.zero, () async {
+      final data = await http.get(
+        'https://api.themoviedb.org/3/movie/now_playing?api_key=239073ac9013319bd7a0c03a2533b982',
+      );
+      setState(() {
+        parsedData = jsonDecode(data.body)['results'];
+      });
+    });
     super.initState();
+  }
+
+  Future callApi() async {
+    parsedData['results'].map((result) {
+      return Text("${result['title']}");
+    }).toList();
   }
 
   @override
@@ -163,6 +181,11 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                     SizedBox(
                       height: 24,
                     ),
+                    Column(
+                      children: parsedData.map<Widget>((result) {
+                        return Text(result['title'] ?? "");
+                      }).toList(),
+                    ),
                     Text(
                       controller.movieList[selectedIndex].description,
                       style: TextStyle(
@@ -194,9 +217,15 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                                   size: 18,
                                 ),
                                 SizedBox(width: 5),
-                                Text(
-                                  'Youtube 리뷰 영상',
-                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await callApi();
+                                  },
+                                  child: Text(
+                                    'Youtube 리뷰 영상',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700),
+                                  ),
                                 ),
                                 SizedBox(width: 6),
                               ],
@@ -293,9 +322,10 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                 itemCount: controller.movieList.length,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      await callApi();
                       setState(() {
-                        selectedIndex = index;
+                        // selectedIndex = index;
                       });
                       itemScrollController.scrollTo(
                           index: selectedIndex,

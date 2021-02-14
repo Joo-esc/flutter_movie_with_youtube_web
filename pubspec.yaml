@@ -41,6 +41,8 @@ dependencies:
   group_button: ^1.1.0
   youtube_player_iframe: ^1.2.0+2
   google_sign_in: ^4.5.9
+  http: ^0.12.2
+
 
 dev_dependencies:
   flutter_test:

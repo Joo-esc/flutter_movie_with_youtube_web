@@ -5,10 +5,16 @@ import 'package:moview_web/model/movie_model.dart';
 class MovieController extends GetxController {
   List<Movie> _movieList = [];
   List<Movie> get movieList => _movieList;
-
   List<Movie> _movieListB = [];
-
   List<Movie> get movieListB => _movieListB;
+  String _selectedId;
+
+  String get selectedId => _selectedId;
+
+  set selectedId(String value) {
+    update(); //notifie
+    _selectedId = value;
+  }
 
   set movieListB(List<Movie> value) {
     update();

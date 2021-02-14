@@ -16,7 +16,7 @@ class GoogleSignInController extends GetxController {
     _isSignIn = false;
   }
 
-  Future login() async {
+  Future<void> login() async {
     final _user = await googleSignIn.signIn();
     _isSignIn = true;
     if (_user == null) {
@@ -31,7 +31,7 @@ class GoogleSignInController extends GetxController {
     }
   }
 
-  void logout() async {
+  Future<void> logout() async {
     await googleSignIn.disconnect();
     FirebaseAuth.instance.signOut();
   }

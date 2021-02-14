@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -9,6 +11,7 @@ import 'package:moview_web/utill/default.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
+// flutter run -d chrome --web-hostname localhost --web-port 5000
 class HomeScreenDesktop extends StatefulWidget {
   @override
   _HomeScreenDesktopState createState() => _HomeScreenDesktopState();
@@ -22,10 +25,12 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
   final controller = Get.put(MovieController());
+  final _message = TextEditingController();
+  final _user = FirebaseAuth.instance.currentUser;
   int selectedIndex = 0;
   int selectedType;
   bool sectionChange = true;
-
+  String textValue;
   List<String> youtubeId = [
     'nPt8bK2gbaU',
     'K18cpp_-gP8',
@@ -45,6 +50,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
 
   @override
   Widget build(BuildContext context) {
+    // sectionChange = false;
     return StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('movies')
@@ -176,9 +182,12 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                     color: Color(0xFF6E6E6E),
                                     borderRadius: BorderRadius.circular(3)),
                                 child: Center(
-                                  child: Text(
-                                    '${snapshot.data.docs[controller.count.value].data()['rating']}세이상 관람가',
-                                    style: TextStyle(color: Colors.white),
+                                  child: GestureDetector(
+                                    onTap: () {},
+                                    child: Text(
+                                      '${snapshot.data.docs[controller.count.value].data()['rating']}세이상 관람가',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -237,7 +246,12 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                                 setState(() {
                                                   sectionChange = false;
                                                 });
-                                                print(sectionChange);
+                                                controller.selectedId = snapshot
+                                                    .data
+                                                    .docs[
+                                                        controller.count.value]
+                                                    .id;
+                                                print(controller.selectedId);
                                               },
                                               child: Text(
                                                 'Youtube 리뷰 영상',
@@ -332,12 +346,149 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                     ),
                                   ],
                                 )
+                              //TODO ALL about textform field
                               : Container(
                                   margin: EdgeInsets.only(top: 20),
                                   color: Colors.black87.withOpacity(0.1),
                                   width:
                                       MediaQuery.of(context).size.width * 0.4,
                                   height: 500,
+                                  child: Column(
+                                    children: [
+                                      //TODO Where text will be show
+                                      Expanded(
+                                        child: Container(
+                                          child: StreamBuilder(
+                                              stream: FirebaseFirestore.instance
+                                                  .collection('movies')
+                                                  .doc(controller.selectedId)
+                                                  .collection('messages')
+                                                  .orderBy('timeStamp',
+                                                      descending: true)
+                                                  .snapshots(),
+                                              builder: (context, snapshot) {
+                                                return ListView.builder(
+                                                  reverse: true,
+                                                  itemCount:
+                                                      snapshot.data.docs.length,
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    bool isMe = _user.uid ==
+                                                        snapshot
+                                                            .data.docs[index]
+                                                            .data()['uid'];
+                                                    return Container(
+                                                      padding:
+                                                          EdgeInsets.all(12),
+                                                      child: Column(
+                                                        crossAxisAlignment: isMe
+                                                            ? CrossAxisAlignment
+                                                                .end
+                                                            : CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Container(
+                                                            padding:
+                                                                EdgeInsets.all(
+                                                                    12),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: isMe
+                                                                  ? Colors
+                                                                      .lightBlueAccent
+                                                                      .withOpacity(
+                                                                          0.4)
+                                                                  : Colors.grey
+                                                                      .withOpacity(
+                                                                          0.4),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                            ),
+                                                            child: Text(
+                                                              snapshot.data
+                                                                      .docs[index]
+                                                                      .data()[
+                                                                  'context'],
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          isMe
+                                                              ? Container()
+                                                              : snapshot.data.docs[index]
+                                                                              .data()[
+                                                                          'uid'] ==
+                                                                      snapshot
+                                                                          .data
+                                                                          .docs[index +
+                                                                              1]
+                                                                          .data()['uid']
+                                                                  ? Container()
+                                                                  : CircleAvatar(
+                                                                      backgroundImage:
+                                                                          NetworkImage(
+                                                                        snapshot
+                                                                            .data
+                                                                            .docs[index]
+                                                                            .data()['photoUrl'],
+                                                                      ),
+                                                                    ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+                                              }),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(12),
+                                        child: TextFormField(
+                                          onChanged: (value) {
+                                            return setState(() {
+                                              textValue = value;
+                                            });
+                                          },
+                                          controller: _message,
+                                          onFieldSubmitted: (value) {},
+                                          decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.black87),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.black87),
+                                            ),
+                                            suffixIcon: GestureDetector(
+                                                onTap: () {
+                                                  Map<String, dynamic> data = {
+                                                    'context': textValue,
+                                                    'timeStamp': DateTime.now(),
+                                                    'uid': _user.uid,
+                                                    'photoUrl': _user.photoURL
+                                                  };
+
+                                                  FirebaseFirestore.instance
+                                                      .collection('movies')
+                                                      .doc(
+                                                          controller.selectedId)
+                                                      .collection('messages')
+                                                      .add(data);
+
+                                                  _message.clear();
+                                                },
+                                                child: Icon(Icons.send)),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                         ],
                       ),
@@ -371,6 +522,9 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                       curve: Curves.easeInOutCubic);
                                 },
                                 onDoubleTap: () {
+                                  controller.selectedId = snapshot
+                                      .data.docs[controller.count.value].id;
+                                  print(controller.selectedId);
                                   setState(() {
                                     sectionChange = false;
                                   });

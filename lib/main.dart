@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
           color: Colors.black,
         ),
       ),
-      home: LoginMain(), //TODO After login screen use MainScreen
+      home: MainScreen(), //TODO After login screen use MainScreen
     );
   }
 }
