@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-
 import 'home_screen_desktop.dart';
 import 'home_screen_mobile.dart';
 import 'home_screen_tablet.dart';

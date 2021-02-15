@@ -28,7 +28,7 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
   @override
   void initState() {
     final controller = Get.put(MovieController());
-    controller.getMovie(controller);
+
     int selectedIndex = 1;
     Future.delayed(Duration.zero, () async {
       final data = await http.get(
@@ -67,8 +67,6 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                   Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: NetworkImage(
-                            controller.movieList[selectedIndex].image),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -142,15 +140,6 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      controller.movieList[selectedIndex].title,
-                      style: GoogleFonts.staatliches(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 96,
-                        ),
-                      ),
-                    ),
                     SizedBox(height: 14),
                     //TODO ==> (개봉연도, 관람가)
                     Row(
@@ -161,19 +150,10 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                           decoration: BoxDecoration(
                               color: Color(0xFF6E6E6E),
                               borderRadius: BorderRadius.circular(3)),
-                          child: Center(
-                            child: Text(
-                              '${controller.movieList[selectedIndex].rating}세 이상 관람과',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
+                          child: Center(),
                         ),
                         SizedBox(
                           width: 14,
-                        ),
-                        Text(
-                          controller.movieList[selectedIndex].year,
-                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ],
                     ),
@@ -186,14 +166,7 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                         return Text(result['title'] ?? "");
                       }).toList(),
                     ),
-                    Text(
-                      controller.movieList[selectedIndex].description,
-                      style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          letterSpacing: 1,
-                          wordSpacing: 0.8,
-                          height: 1.4),
-                    ),
+
                     SizedBox(
                       height: 30,
                     ),
@@ -319,7 +292,7 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                 scrollDirection: Axis.horizontal,
                 itemScrollController: itemScrollController,
                 itemPositionsListener: itemPositionsListener,
-                itemCount: controller.movieList.length,
+                itemCount: 3,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     onTap: () async {
@@ -337,10 +310,6 @@ class _HomeScreenTabletState extends State<HomeScreenTablet> {
                       width: 236,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: Image.network(
-                          controller.movieList[index].image,
-                          fit: BoxFit.cover,
-                        ),
                       ),
                     ),
                   );

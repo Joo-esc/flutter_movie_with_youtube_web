@@ -1,19 +1,15 @@
 class Movie {
+  int id;
   String image;
-  String description;
-  String rating;
   String title;
-  int likes;
-  String year;
-  // HomeDetailDesktop
-  Movie(this.image, this.description, this.rating, this.likes);
+  String description;
+  Movie({this.id, this.image, this.title, this.description});
 
-  Movie.fromMap(Map<String, dynamic> data) {
-    image = data['image'];
-    description = data['description'];
-    rating = data['rating'];
-    likes = data['likes'];
-    year = data['year'];
-    title = data['title'];
+  factory Movie.fromJson(Map<String, dynamic> json) {
+    return Movie(
+        id: json['id'],
+        image: json['poster_path'],
+        title: json['title'],
+        description: json['overview']);
   }
 }

@@ -1,12 +1,11 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:moview_web/model/movie_model.dart';
+import 'package:http/http.dart' as http;
 
 class MovieController extends GetxController {
-  List<Movie> _movieList = [];
-  List<Movie> get movieList => _movieList;
-  List<Movie> _movieListB = [];
-  List<Movie> get movieListB => _movieListB;
   String _selectedId;
 
   String get selectedId => _selectedId;
@@ -16,98 +15,53 @@ class MovieController extends GetxController {
     _selectedId = value;
   }
 
-  set movieListB(List<Movie> value) {
-    update();
-    _movieListB = value;
-  }
-
-  List<Movie> _movieListA = [];
-
-  List<Movie> get movieListA => _movieListA;
-
-  set movieListA(List<Movie> value) {
-    update();
-    _movieListA = value;
-  }
-
   RxInt count = 0.obs;
+  List<Movie> _movieList = [];
+  List<Movie> get movieList => _movieList;
 
   set movieList(List<Movie> value) {
     update();
     _movieList = value;
   }
 
-  // Get snapshot into controller
-  getMovie(MovieController movieController) async {
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection('movies').get();
+  getMovies(MovieController movieController) async {
+    Future.delayed(Duration.zero, () async {
+      final data = await http.get(
+        'https://api.themoviedb.org/3/movie/popular?api_key=239073ac9013319bd7a0c03a2533b982&language=ko&page=1®ion=KR',
+      );
+      // final result = jsonDecode(data.body);
+      var parsed = jsonDecode(data.body)['results'];
+      List<Movie> _movieLista =
+          List<Movie>.from(parsed.map((i) => Movie.fromJson(i)));
+      movieController.movieList = _movieLista;
 
-    List<Movie> _movieLista = [];
-
-    snapshot.docs.forEach((document) {
-      Movie movie = Movie.fromMap(document.data());
-      _movieLista.add(movie);
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('movies').get();
+      snapshot.docs.forEach((document) {
+        Movie movie = Movie.fromJson(document.data());
+      });
     });
-
-    movieController._movieList = _movieLista;
-  }
-
-  getMovieA(MovieController movieController) async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('movies')
-        .where('type', isEqualTo: '해외')
-        .get();
-
-    List<Movie> _movieLista = [];
-
-    snapshot.docs.forEach((document) {
-      Movie movie = Movie.fromMap(document.data());
-      _movieLista.add(movie);
-    });
-
-    movieController._movieListA = _movieLista;
-  }
-
-  getMovieB(MovieController movieController) async {
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('movies')
-        .where('type', isEqualTo: '국내')
-        .get();
-
-    List<Movie> _movieLista = [];
-
-    snapshot.docs.forEach((document) {
-      Movie movie = Movie.fromMap(document.data());
-      _movieLista.add(movie);
-    });
-
-    movieController._movieListB = _movieLista;
   }
 }
 
+// import 'dart:convert';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:get/get.dart';
 // import 'package:moview_web/model/movie_model.dart';
+// import 'package:http/http.dart' as http;
 //
 // class MovieController extends GetxController {
+//   String _selectedId;
+//
+//   String get selectedId => _selectedId;
+//
+//   set selectedId(String value) {
+//     update(); //notifie
+//     _selectedId = value;
+//   }
+//
+//   RxInt count = 0.obs;
 //   List<Movie> _movieList = [];
-//   int _selectedIndex;
-//   RxInt _aimIndex = 0.obs;
-//
-//   RxInt get aimIndex => _aimIndex;
-//
-//   set aimIndex(RxInt value) {
-//     update();
-//     _aimIndex = value;
-//   }
-//
-//   int get selectedIndex => _selectedIndex;
-//
-//   set selectedIndex(int value) {
-//     update();
-//     _selectedIndex = value;
-//   }
-//
 //   List<Movie> get movieList => _movieList;
 //
 //   set movieList(List<Movie> value) {
@@ -115,16 +69,19 @@ class MovieController extends GetxController {
 //     _movieList = value;
 //   }
 //
-//   getMovie(MovieController movieController) async {
-//     QuerySnapshot snapshot =
-//     await FirebaseFirestore.instance.collection('movies').get();
-//     List<Movie> _movieLista = [];
-//
-//     snapshot.docs.forEach((document) {
-//       Movie movie = Movie.fromMap(document.data());
-//       _movieLista.add(movie);
+//   getMovies(MovieController movieController) async {
+//     Future.delayed(Duration.zero, () async {
+//       final data = await http.get(
+//         'https://api.themoviedb.org/3/movie/now_playing?api_key=239073ac9013319bd7a0c03a2533b982',
+//       );
+//       final result = jsonDecode(data.body);
+//       var parsed = json.decode(data.body)['results'];
+//       var list = parsed.map((i) => Movie.fromJson(i)).toList();
+//       List<Movie> _movieLista =
+//       List<Movie>.from(parsed.map((i) => Movie.fromJson(i)));
+//       // List<Movie> _movieLista = [];
+//       // _movieLista = result['results'];
+//       movieController.movieList = _movieLista;
 //     });
-//
-//     movieController._movieList = _movieLista;
 //   }
 // }

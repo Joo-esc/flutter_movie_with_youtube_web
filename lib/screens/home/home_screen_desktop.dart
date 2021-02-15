@@ -41,10 +41,9 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   ];
   @override
   void initState() {
-    final controller = Get.put(MovieController());
-    controller.getMovie(controller);
     super.initState();
-
+    final controller = Get.put(MovieController());
+    controller.getMovies(controller);
     YoutubePlayerController _controller;
   }
 
@@ -74,9 +73,11 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                         Container(
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: NetworkImage(snapshot
-                                  .data.docs[controller.count.value]
-                                  .data()['image']),
+                              image: NetworkImage(
+                                  'https://image.tmdb.org/t/p/original/' +
+                                      controller
+                                          .movieList[controller.count.value]
+                                          .image),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -96,7 +97,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                     0.0,
                                     1.0
                                   ])),
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -162,8 +163,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            snapshot.data.docs[controller.count.value]
-                                .data()['title'],
+                            controller.movieList[controller.count.value].title,
                             style: GoogleFonts.staatliches(
                               textStyle: TextStyle(
                                 color: Colors.white,
@@ -207,8 +207,8 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                             height: 24,
                           ),
                           Text(
-                            snapshot.data.docs[controller.count.value]
-                                .data()['description'],
+                            controller
+                                .movieList[controller.count.value].description,
                             style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 letterSpacing: 1,
@@ -510,7 +510,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                             scrollDirection: Axis.horizontal,
                             itemScrollController: itemScrollController,
                             itemPositionsListener: itemPositionsListener,
-                            itemCount: snapshot.data.docs.length,
+                            itemCount: controller.movieList.length,
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () {
@@ -539,9 +539,9 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                   width: 236,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15),
-                                    child: Image.network(snapshot
-                                        .data.docs[index]
-                                        .data()['image']),
+                                    child: Image.network(
+                                        'https://image.tmdb.org/t/p/original/' +
+                                            controller.movieList[index].image),
                                   ),
                                 ),
                               );
