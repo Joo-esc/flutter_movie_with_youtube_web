@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
 import 'package:moview_web/controller/movie_controller.dart';
+import 'package:moview_web/controller/youtube_controller.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
@@ -43,6 +44,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   void initState() {
     super.initState();
     final controller = Get.put(MovieController());
+    controller.getYoutube(controller);
     controller.getMovies(controller);
     YoutubePlayerController _controller;
   }
@@ -162,14 +164,26 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            controller.movieList[controller.count.value].title,
-                            style: GoogleFonts.staatliches(
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                                fontSize: 96,
+                          Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  print(controller.youtubeList[1].videoId);
+                                },
+                                child: Text(
+                                  controller
+                                      .movieList[controller.count.value].title,
+                                  style: GoogleFonts.staatliches(
+                                    textStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 96,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              // Text(controller
+                              //     .youtubeList[controller.count.value].videoId),
+                            ],
                           ),
                           SizedBox(height: 14),
                           //TODO ==> (개봉연도, 관람가)
@@ -185,7 +199,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                   child: GestureDetector(
                                     onTap: () {},
                                     child: Text(
-                                      '${snapshot.data.docs[controller.count.value].data()['rating']}세이상 관람가',
+                                      '15세이상 관람가',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ),
@@ -195,8 +209,9 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                 width: 14,
                               ),
                               Text(
-                                snapshot.data.docs[controller.count.value]
-                                    .data()['year'],
+                                controller.movieList[controller.count.value]
+                                    .releaseDate
+                                    .substring(0, 4),
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 16),
                               ),

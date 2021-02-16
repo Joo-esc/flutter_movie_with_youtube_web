@@ -3,13 +3,16 @@ class Movie {
   String image;
   String title;
   String description;
-  Movie({this.id, this.image, this.title, this.description});
+  String releaseDate;
+  Movie({this.id, this.image, this.title, this.description, this.releaseDate});
 
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
-        id: json['id'],
-        image: json['poster_path'],
-        title: json['title'],
-        description: json['overview']);
+      id: json['id'],
+      image: json['poster_path'],
+      title: json['title'],
+      description: json['overview'],
+      releaseDate: json['release_date'],
+    );
   }
 }
