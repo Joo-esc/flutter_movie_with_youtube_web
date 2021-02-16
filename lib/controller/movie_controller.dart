@@ -7,6 +7,14 @@ import 'package:http/http.dart' as http;
 import 'package:moview_web/model/youtube.dart';
 
 class MovieController extends GetxController {
+  String _selectedTitle;
+  String get selectedTitle => _selectedTitle;
+
+  set selectedTitle(String value) {
+    update();
+    _selectedTitle = value;
+  }
+
   String _selectedId;
   String get selectedId => _selectedId;
   RxInt count = 0.obs;
@@ -45,18 +53,18 @@ class MovieController extends GetxController {
     });
   }
 
-  getYoutube(MovieController movieController) async {
-    Future.delayed(Duration.zero, () async {
-      final data = await http.get(
-          'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=%EC%9B%90%EB%8D%94%EC%9A%B0%EB%A8%BC1984%EB%A6%AC%EB%B7%B0&type=video&key=AIzaSyDiso0MRPiMzF5Fm35_9lymcJcCjCqN53M');
-      // 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=%EC%9B%90%EB%8D%94%EC%9A%B0%EB%A8%BC1984%EB%A6%AC%EB%B7%B0&type=video&key=AIzaSyDiso0MRPiMzF5Fm35_9lymcJcCjCqN53M');
-      // final result = jsonDecode(data.body);
-      var parsed = jsonDecode(data.body)['items'];
-      List<Youtube> _youtubeLista =
-          List<Youtube>.from(parsed.map((i) => Youtube.fromJson(i)));
-      movieController.youtubeList = _youtubeLista;
-    });
-  }
+  // getYoutube(MovieController movieController) async {
+  //   Future.delayed(Duration.zero, () async {
+  //     final data = await http.get(
+  //         'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=어벤져스리뷰&type=video&key=AIzaSyDiso0MRPiMzF5Fm35_9lymcJcCjCqN53M');
+  //     // 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=%EC%9B%90%EB%8D%94%EC%9A%B0%EB%A8%BC1984%EB%A6%AC%EB%B7%B0&type=video&key=AIzaSyDiso0MRPiMzF5Fm35_9lymcJcCjCqN53M');
+  //     // final result = jsonDecode(data.body);
+  //     var parsed = jsonDecode(data.body)['items'];
+  //     List<Youtube> _youtubeLista =
+  //         List<Youtube>.from(parsed.map((i) => Youtube.fromJson(i)));
+  //     movieController.youtubeList = _youtubeLista;
+  //   });
+  // }
 }
 
 // import 'dart:convert';

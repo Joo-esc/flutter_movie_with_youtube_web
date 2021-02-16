@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
 import 'package:moview_web/controller/movie_controller.dart';
 import 'package:moview_web/controller/youtube_controller.dart';
+import 'package:moview_web/model/youtube.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
@@ -26,6 +29,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
   final controller = Get.put(MovieController());
+  final youController = Get.put(YoutubeController());
   final _message = TextEditingController();
   final _user = FirebaseAuth.instance.currentUser;
   int selectedIndex = 0;
@@ -42,15 +46,30 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   ];
   @override
   void initState() {
-    super.initState();
     final controller = Get.put(MovieController());
-    controller.getYoutube(controller);
+    final youtubeController = Get.put(YoutubeController());
+    youtubeController.getYoutube(youtubeController);
     controller.getMovies(controller);
     YoutubePlayerController _controller;
+    controller.selectedTitle = controller.movieList[0].title;
+
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration.zero, () async {
+      final data = await http.get(
+          'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=${controller.selectedTitle}영화리뷰&type=video&key=AIzaSyCypTB1-a4cdVAK85uGH6-Z9rUGgvL2V0s');
+      // 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=어벤져스리뷰&type=video&key=AIzaSyDiso0MRPiMzF5Fm35_9lymcJcCjCqN53M');
+      // 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=%EC%9B%90%EB%8D%94%EC%9A%B0%EB%A8%BC1984%EB%A6%AC%EB%B7%B0&type=video&key=AIzaSyDiso0MRPiMzF5Fm35_9lymcJcCjCqN53M');
+      // final result = jsonDecode(data.body);
+      var parsed = jsonDecode(data.body)['items'];
+      List<Youtube> _youtubeLista =
+          List<Youtube>.from(parsed.map((i) => Youtube.fromJson(i)));
+      youController.youtubeList = _youtubeLista;
+    });
+
     // sectionChange = false;
     return StreamBuilder(
         stream: FirebaseFirestore.instance
@@ -266,7 +285,6 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                                     .docs[
                                                         controller.count.value]
                                                     .id;
-                                                print(controller.selectedId);
                                               },
                                               child: Text(
                                                 'Youtube 리뷰 영상',
@@ -535,6 +553,9 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                       index: controller.count.value,
                                       duration: Duration(seconds: 1),
                                       curve: Curves.easeInOutCubic);
+                                  // youtube detial
+                                  controller.selectedTitle = controller
+                                      .movieList[controller.count.value].title;
                                 },
                                 onDoubleTap: () {
                                   controller.selectedId = snapshot
@@ -548,6 +569,9 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                       index: controller.count.value,
                                       duration: Duration(seconds: 1),
                                       curve: Curves.easeInOutCubic);
+                                  // youtube detial
+                                  controller.selectedTitle = controller
+                                      .movieList[controller.count.value].title;
                                 },
                                 child: Container(
                                   margin: EdgeInsets.only(right: 20),
@@ -575,18 +599,13 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                             diameterRatio: 6,
                             childDelegate: ListWheelChildBuilderDelegate(
                                 builder: (BuildContext context, int index) {
-                              if (index < 0 ||
-                                  index >
-                                      snapshot.data.docs[controller.count.value]
-                                              .data()['youtubeLink']
-                                              .length -
-                                          1) {
+                              if (index < 0 || index > 2) {
                                 return null;
                               }
                               _controller = YoutubePlayerController(
-                                initialVideoId: snapshot
-                                    .data.docs[controller.count.value]
-                                    .data()['youtubeLink'][index],
+                                initialVideoId:
+                                    youController.youtubeList[index].videoId,
+                                // controller.youtubeList[index].videoId,
                                 params: YoutubePlayerParams(
                                   // Defining custom playlist
                                   startAt: Duration(seconds: 1),
