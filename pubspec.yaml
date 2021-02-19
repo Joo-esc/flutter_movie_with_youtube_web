@@ -43,6 +43,10 @@ dependencies:
   google_sign_in: ^4.5.9
   http: ^0.12.2
   provider: ^4.3.3
+  expandable_text: ^1.3.2
+  readmore: ^1.0.1
+  auto_size_text_pk: ^3.0.0-nullsafety.1
+  sizer: ^1.1.8
 
 dev_dependencies:
   flutter_test:
@@ -91,3 +95,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+

@@ -6,7 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:moview_web/screens/home/home_screen.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-
+import 'package:flutter/services.dart';
 import 'screens/login/login_main_screen.dart';
 
 GoogleSignIn _googleSignIn = GoogleSignIn(
@@ -17,7 +17,6 @@ GoogleSignIn _googleSignIn = GoogleSignIn(
 );
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(MyApp());
 }

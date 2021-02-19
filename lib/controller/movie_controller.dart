@@ -4,22 +4,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:moview_web/model/movie_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:moview_web/model/people.dart';
 import 'package:moview_web/model/youtube.dart';
 
 class MovieController extends GetxController {
   String _selectedTitle;
-  String get selectedTitle => _selectedTitle;
-
-  set selectedTitle(String value) {
-    update();
-    _selectedTitle = value;
-  }
-
   String _selectedId;
   String get selectedId => _selectedId;
   RxInt count = 0.obs;
   List<Movie> _movieList = [];
   List<Youtube> _youtubeList = [];
+  List<People> _peopleList = [];
+  int _movieId;
+
+  int get movieId => _movieId;
+
+  set movieId(int value) {
+    update();
+    _movieId = value;
+  }
+
+  List<People> get peopleList => _peopleList;
+  set peopleList(List<People> value) {
+    update();
+    _peopleList = value;
+  }
+
+  String get selectedTitle => _selectedTitle;
+  set selectedTitle(String value) {
+    update();
+    _selectedTitle = value;
+  }
 
   List<Youtube> get youtubeList => _youtubeList;
 
