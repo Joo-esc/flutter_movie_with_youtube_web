@@ -60,26 +60,24 @@ class MovieController extends GetxController {
       final data = await http.get(
         'https://api.themoviedb.org/3/movie/popular?api_key=239073ac9013319bd7a0c03a2533b982&language=ko&page=1®ion=KR',
       );
-      // final result = jsonDecode(data.body);
-      var parsed = jsonDecode(data.body)['results'];
-      List<Movie> _movieLista =
-          List<Movie>.from(parsed.map((i) => Movie.fromJson(i)));
-      movieController.movieList = _movieLista;
+      if (data.statusCode == 200) {
+        var parsed = jsonDecode(data.body)['results'];
+        List<Movie> _movieLista =
+            List<Movie>.from(parsed.map((i) => Movie.fromJson(i)));
+        movieController.movieList = _movieLista;
+      } else {
+        throw Exception('Failed to load the movies');
+      }
     });
   }
 
-  // getYoutube(MovieController movieController) async {
-  //   Future.delayed(Duration.zero, () async {
-  //     final data = await http.get(
-  //         'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=어벤져스리뷰&type=video&key=AIzaSyDiso0MRPiMzF5Fm35_9lymcJcCjCqN53M');
-  //     // 'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=%EC%9B%90%EB%8D%94%EC%9A%B0%EB%A8%BC1984%EB%A6%AC%EB%B7%B0&type=video&key=AIzaSyDiso0MRPiMzF5Fm35_9lymcJcCjCqN53M');
-  //     // final result = jsonDecode(data.body);
-  //     var parsed = jsonDecode(data.body)['items'];
-  //     List<Youtube> _youtubeLista =
-  //         List<Youtube>.from(parsed.map((i) => Youtube.fromJson(i)));
-  //     movieController.youtubeList = _youtubeLista;
-  //   });
-  // }
+  @override
+  void onInit() {
+    super.onInit();
+    ever(count, (_) {
+      print('same as you think');
+    });
+  }
 }
 
 // import 'dart:convert';

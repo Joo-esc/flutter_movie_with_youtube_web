@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:expandable_text/expandable_text.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,7 +12,6 @@ import 'package:moview_web/controller/movie_controller.dart';
 import 'package:moview_web/controller/youtube_controller.dart';
 import 'package:moview_web/model/youtube.dart';
 import 'package:moview_web/utill/default.dart';
-import 'package:readmore/readmore.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 

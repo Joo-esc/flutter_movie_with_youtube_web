@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:moview_web/controller/movie_controller.dart';
+import 'package:moview_web/model/movie_model.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'home_screen_desktop.dart';
 import 'home_screen_mobile.dart';
@@ -10,6 +13,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Size sized = MediaQuery.of(context).size;
+    final controller = Get.put(MovieController());
+    controller.getMovies(controller);
+
     return ResponsiveBuilder(
       builder: (context, size) {
         if (size.isMobile) {

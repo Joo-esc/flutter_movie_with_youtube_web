@@ -12,6 +12,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:moview_web/main.dart' as app;
 
 void main() => run(_testMain);
+// ??
+run(void Function() testMain) {}
 
 void _testMain() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
