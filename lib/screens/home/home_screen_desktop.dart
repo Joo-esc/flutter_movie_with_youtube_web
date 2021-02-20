@@ -15,6 +15,7 @@ import 'package:moview_web/controller/movie_controller.dart';
 import 'package:moview_web/controller/youtube_controller.dart';
 import 'package:moview_web/model/movie_model.dart';
 import 'package:moview_web/model/people.dart';
+import 'package:moview_web/model/recommend_moive.dart';
 import 'package:moview_web/model/youtube.dart';
 import 'package:moview_web/utill/default.dart';
 
@@ -29,7 +30,7 @@ class HomeScreenDesktop extends StatefulWidget {
 }
 
 class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
-  int selectedType;
+  int selectedType = 0;
   bool sectionChange = true;
   YoutubePlayerController _controller;
   final controller = Get.put(MovieController());
@@ -37,12 +38,15 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
+  bool _isLoading = true;
   var parsedData;
+
   @override
   void initState() {
     YoutubePlayerController _controller;
     final controller = Get.put(MovieController());
     controller.getMovies(controller);
+    controller.getRecommendMovie(controller);
     Future.delayed(Duration.zero, () async {
       final data = await http.get(
           'https://api.themoviedb.org/3/movie/popular?api_key=239073ac9013319bd7a0c03a2533b982&language=ko&page=1®ion=KR');
@@ -51,21 +55,50 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
       });
     });
     controller.count.value = 0;
-// TODO
-
+    //Main problem
+    setState(() {
+      _isLoading = true;
+    });
+    controller.movieList.add(Movie(
+        id: 581389,
+        image: '/6TPZSJ06OEXeelx1U1VIAt0j9Ry.jpg',
+        title: '승리호',
+        releaseDate: '2020-12-15',
+        description: 'a'));
+    setState(() {
+      _isLoading = false;
+    });
+    controller.recommendList.add(RecommendMovie(
+        image: '/6TPZSJ06OEXeelx1U1VIAt0j9Ry.jpg',
+        title: '',
+        releaseDate: '2020-12-15',
+        description: 'a'));
+    //TODO Initialized the first youtubeDetail(Section change Screen)
+    Future.delayed(Duration.zero, () async {
+      controller.selectedTitle = controller.movieList[0].title;
+      final data = await http.get(
+          'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=${controller.selectedTitle}영화리뷰&type=video&key=AIzaSyD3fnU3T40qMXKlsnVmhKQryqHUO8h4zTY');
+      var parsed = jsonDecode(data.body)['items'];
+      List<Youtube> _youtubeLista =
+          List<Youtube>.from(parsed.map((i) => Youtube.fromJson(i)));
+      youController.youtubeList = _youtubeLista;
+    });
+    Future.delayed(Duration.zero, () async {
+      controller.movieId = controller.movieList[0].id;
+      final data = await http.get(
+        'https://api.themoviedb.org/3/movie/${controller.movieId}/credits?api_key=239073ac9013319bd7a0c03a2533b982&language=ko&page=1%C2%AEion=KR',
+      );
+      // final result = jsonDecode(data.body);
+      var parsed = jsonDecode(data.body)['cast'];
+      List<People> _peopleLista =
+          List<People>.from(parsed.map((i) => People.fromJson(i)));
+      controller.peopleList = _peopleLista;
+    });
     super.initState();
-    // List<Youtube> _youtubeLista =
-    // List<Youtube>.from(parsed.map((i) => Youtube.fromJson(i)));
-    // youController.youtubeList = _youtubeLista;
   }
 
   @override
   Widget build(BuildContext context) {
-    controller.movieList.add(Movie(
-        image: parsedData[0]['poster_path'],
-        title: parsedData[0]['title'],
-        releaseDate: parsedData[0]['release_date'],
-        description: parsedData[0]['overview']));
     controller.selectedTitle = controller.movieList[0].title;
     Size sized = MediaQuery.of(context).size;
     return LayoutBuilder(builder: (context, constraints) {
@@ -89,10 +122,13 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                       Container(
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: NetworkImage(
-                                'https://image.tmdb.org/t/p/original' +
-                                    controller.movieList[controller.count.value]
-                                        .image),
+                            image: NetworkImage(selectedType == 0
+                                ? 'https://image.tmdb.org/t/p/original' +
+                                    controller
+                                        .movieList[controller.count.value].image
+                                : controller
+                                    .recommendList[controller.count.value]
+                                    .image),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -178,7 +214,9 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  print(controller.movieList[0].id);
+                                },
                                 child: Container(
                                   color: Colors.red,
                                   width: 100,
@@ -186,8 +224,12 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                 ),
                               ),
                               Text(
-                                controller
-                                    .movieList[controller.count.value].title,
+                                selectedType == 0
+                                    ? controller
+                                        .movieList[controller.count.value].title
+                                    : controller
+                                        .recommendList[controller.count.value]
+                                        .title,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 28.0.sp),
                                 maxLines: 1,
@@ -215,9 +257,15 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                     width: 14,
                                   ),
                                   Text(
-                                    controller.movieList[controller.count.value]
-                                        .releaseDate
-                                        .substring(0, 4),
+                                    selectedType == 0
+                                        ? controller
+                                            .movieList[controller.count.value]
+                                            .releaseDate
+                                            .substring(0, 4)
+                                        : controller
+                                            .recommendList[
+                                                controller.count.value]
+                                            .releaseDate,
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 16),
                                   ),
@@ -240,10 +288,15 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                         height: 70,
                                         child: SingleChildScrollView(
                                           child: Text(
-                                            controller
-                                                .movieList[
-                                                    controller.count.value]
-                                                .description,
+                                            selectedType == 0
+                                                ? controller
+                                                    .movieList[
+                                                        controller.count.value]
+                                                    .description
+                                                : controller
+                                                    .recommendList[
+                                                        controller.count.value]
+                                                    .description,
                                             style: TextStyle(
                                                 color: Colors.white
                                                     .withOpacity(0.8),
@@ -485,7 +538,9 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                             scrollDirection: Axis.horizontal,
                             itemScrollController: itemScrollController,
                             itemPositionsListener: itemPositionsListener,
-                            itemCount: controller.movieList.length,
+                            itemCount: selectedType == 0
+                                ? controller.movieList.length
+                                : controller.recommendList.length,
                             itemBuilder: (BuildContext context, int index) {
                               return GestureDetector(
                                 onTap: () {
@@ -505,7 +560,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                         .movieList[controller.count.value]
                                         .title;
                                     final data = await http.get(
-                                        'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=${controller.selectedTitle}영화리뷰&type=video&key=AIzaSyBcPV1IoW00mYug7BQLX0o7XC0nkdmzHv4');
+                                        'https://www.googleapis.com/youtube/v3/search?part=snippet&maxRsults=5&q=${controller.selectedTitle}영화리뷰&type=video&key=AIzaSyD3fnU3T40qMXKlsnVmhKQryqHUO8h4zTY');
                                     var parsed = jsonDecode(data.body)['items'];
                                     List<Youtube> _youtubeLista =
                                         List<Youtube>.from(parsed
@@ -547,9 +602,11 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                   width: 236,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15),
-                                    child: Image.network(
-                                        'https://image.tmdb.org/t/p/original/' +
-                                            controller.movieList[index].image),
+                                    child: Image.network(selectedType == 0
+                                        ? 'https://image.tmdb.org/t/p/original/' +
+                                            controller.movieList[index].image
+                                        : controller
+                                            .recommendList[index].image),
                                   ),
                                 ),
                               );
@@ -582,7 +639,10 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                 return null;
               }
               _controller = YoutubePlayerController(
-                initialVideoId: youController.youtubeList[index].videoId,
+                initialVideoId: selectedType == 0
+                    ? youController.youtubeList[index].videoId
+                    : controller.recommendList[controller.count.value]
+                        .youtubeLink[index],
                 // controller.youtubeList[index].videoId,
                 params: YoutubePlayerParams(
                   // Defining custom playlist

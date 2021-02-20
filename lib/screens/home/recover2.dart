@@ -658,3 +658,9 @@
 //     );
 //   }
 // }
+
+// controller.movieList.add(Movie(
+// image: parsedData[0]['poster_path'],
+// title: parsedData[0]['title'],
+// releaseDate: parsedData[0]['release_date'],
+// description: parsedData[0]['overview']));

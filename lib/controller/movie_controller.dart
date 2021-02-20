@@ -5,9 +5,11 @@ import 'package:get/get.dart';
 import 'package:moview_web/model/movie_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:moview_web/model/people.dart';
+import 'package:moview_web/model/recommend_moive.dart';
 import 'package:moview_web/model/youtube.dart';
 
 class MovieController extends GetxController {
+  int _movieId;
   String _selectedTitle;
   String _selectedId;
   String get selectedId => _selectedId;
@@ -15,10 +17,15 @@ class MovieController extends GetxController {
   List<Movie> _movieList = [];
   List<Youtube> _youtubeList = [];
   List<People> _peopleList = [];
-  int _movieId;
+  List<RecommendMovie> _recommendList = [];
+
+  List<RecommendMovie> get recommendList => _recommendList;
+  set recommendList(List<RecommendMovie> value) {
+    update();
+    _recommendList = value;
+  }
 
   int get movieId => _movieId;
-
   set movieId(int value) {
     update();
     _movieId = value;
@@ -37,7 +44,6 @@ class MovieController extends GetxController {
   }
 
   List<Youtube> get youtubeList => _youtubeList;
-
   set youtubeList(List<Youtube> value) {
     update();
     _youtubeList = value;
@@ -49,7 +55,6 @@ class MovieController extends GetxController {
   }
 
   List<Movie> get movieList => _movieList;
-
   set movieList(List<Movie> value) {
     update();
     _movieList = value;
@@ -69,6 +74,19 @@ class MovieController extends GetxController {
         throw Exception('Failed to load the movies');
       }
     });
+  }
+
+  getRecommendMovie(MovieController movieController) async {
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('movies').get();
+
+    List<RecommendMovie> _recommendlista = [];
+
+    snapshot.docs.forEach((document) {
+      RecommendMovie recommendMovie = RecommendMovie.fromMap(document.data());
+      _recommendlista.add(recommendMovie);
+    });
+    movieController.recommendList = _recommendlista;
   }
 
   @override
