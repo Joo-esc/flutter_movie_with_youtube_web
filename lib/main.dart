@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:moview_web/screens/home/home_screen.dart';
@@ -69,128 +70,163 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return ResponsiveBuilder(builder: (_, size) {
       return Scaffold(
+        backgroundColor: kSidebarColor,
         key: _scaffoldKey,
         appBar: size.isMobile
             ? AppBar(
-                backgroundColor: Colors.cyanAccent,
+                backgroundColor: kSidebarColor,
+                elevation: 0,
+                centerTitle: false,
+                title: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      FontAwesomeIcons.youtube,
+                      size: 30,
+                      color: kSideBarActiveIconColor,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text.rich(TextSpan(children: <TextSpan>[
+                      TextSpan(
+                          text: 'Movie',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                          )),
+                    ])),
+                  ],
+                ),
               )
+            // AppBar(
+            //         elevation: 0,
+            //         actions: [
+            //           Padding(
+            //             padding: const EdgeInsets.all(16),
+            //             child: Icon(Icons.search, color: Color(0xFF616161)),
+            //           ),
+            //         ],
+            //         backgroundColor: kSidebarColor,
+            //       )
             : PreferredSize(
                 preferredSize: Size(00, 0),
                 child: Container(),
               ),
-        drawer: size.isMobile
-            ? SizedBox(
-                width: 200,
-                child: Drawer(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 1000, bottom: 200),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedIndex = 0;
-                              _pageController.jumpToPage(0);
-                              Navigator.pop(context);
-                            });
-                          },
-                          child: CircleAvatar(
-                            radius: 25,
-                            child: ClipRRect(
-                                borderRadius: BorderRadius.circular(30),
-                                child: Image.asset(
-                                  'assets/images/logo_black.png',
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.fitHeight,
-                                )),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedIndex = 1;
-                              _pageController.jumpToPage(1);
-                              Navigator.pop(context);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.design_services_rounded,
-                            color: _selectedIndex == 1
-                                ? Colors.redAccent
-                                : Colors.grey,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedIndex = 2;
-                              _pageController.jumpToPage(2);
-                              Navigator.pop(context);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.search,
-                            color: _selectedIndex == 2
-                                ? Colors.orange
-                                : Colors.grey,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedIndex = 3;
-                              _pageController.jumpToPage(3);
-                              Navigator.pop(context);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.star,
-                            color: _selectedIndex == 3
-                                ? Colors.amber
-                                : Colors.grey,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedIndex = 4;
-                              _pageController.jumpToPage(4);
-                              Navigator.pop(context);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.person,
-                            color: _selectedIndex == 4
-                                ? Colors.green
-                                : Colors.grey,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedIndex = 5;
-                              _pageController.jumpToPage(5);
-                              Navigator.pop(context);
-                            });
-                          },
-                          icon: Icon(
-                            Icons.bookmark,
-                            color: _selectedIndex == 5
-                                ? Colors.indigoAccent
-                                : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ))
-            : Container(
-                width: 100,
-                height: 100,
-                color: Colors.red,
-              ),
+        //TODO DRAWER KEEP
+        // drawer: size.isMobile
+        //     ? SizedBox(
+        //         width: 400,
+        //         child: Drawer(
+        //           child: Padding(
+        //             padding: EdgeInsets.only(top: 1000, bottom: 200),
+        //             child: Column(
+        //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //               children: [
+        //                 GestureDetector(
+        //                   onTap: () {
+        //                     setState(() {
+        //                       _selectedIndex = 0;
+        //                       _pageController.jumpToPage(0);
+        //                       Navigator.pop(context);
+        //                     });
+        //                   },
+        //                   child: CircleAvatar(
+        //                     radius: 25,
+        //                     child: ClipRRect(
+        //                         borderRadius: BorderRadius.circular(30),
+        //                         child: Image.asset(
+        //                           'assets/images/logo_black.png',
+        //                           width: double.infinity,
+        //                           height: double.infinity,
+        //                           fit: BoxFit.fitHeight,
+        //                         )),
+        //                   ),
+        //                 ),
+        //                 IconButton(
+        //                   onPressed: () {
+        //                     setState(() {
+        //                       _selectedIndex = 1;
+        //                       _pageController.jumpToPage(1);
+        //                       Navigator.pop(context);
+        //                     });
+        //                   },
+        //                   icon: Icon(
+        //                     Icons.design_services_rounded,
+        //                     color: _selectedIndex == 1
+        //                         ? Colors.redAccent
+        //                         : Colors.grey,
+        //                   ),
+        //                 ),
+        //                 IconButton(
+        //                   onPressed: () {
+        //                     setState(() {
+        //                       _selectedIndex = 2;
+        //                       _pageController.jumpToPage(2);
+        //                       Navigator.pop(context);
+        //                     });
+        //                   },
+        //                   icon: Icon(
+        //                     Icons.search,
+        //                     color: _selectedIndex == 2
+        //                         ? Colors.orange
+        //                         : Colors.grey,
+        //                   ),
+        //                 ),
+        //                 IconButton(
+        //                   onPressed: () {
+        //                     setState(() {
+        //                       _selectedIndex = 3;
+        //                       _pageController.jumpToPage(3);
+        //                       Navigator.pop(context);
+        //                     });
+        //                   },
+        //                   icon: Icon(
+        //                     Icons.star,
+        //                     color: _selectedIndex == 3
+        //                         ? Colors.amber
+        //                         : Colors.grey,
+        //                   ),
+        //                 ),
+        //                 IconButton(
+        //                   onPressed: () {
+        //                     setState(() {
+        //                       _selectedIndex = 4;
+        //                       _pageController.jumpToPage(4);
+        //                       Navigator.pop(context);
+        //                     });
+        //                   },
+        //                   icon: Icon(
+        //                     Icons.person,
+        //                     color: _selectedIndex == 4
+        //                         ? Colors.green
+        //                         : Colors.grey,
+        //                   ),
+        //                 ),
+        //                 IconButton(
+        //                   onPressed: () {
+        //                     setState(() {
+        //                       _selectedIndex = 5;
+        //                       _pageController.jumpToPage(5);
+        //                       Navigator.pop(context);
+        //                     });
+        //                   },
+        //                   icon: Icon(
+        //                     Icons.bookmark,
+        //                     color: _selectedIndex == 5
+        //                         ? Colors.indigoAccent
+        //                         : Colors.grey,
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //         ))
+        //     : Container(
+        //         width: 100,
+        //         height: 100,
+        //         color: Colors.red,
+        //       ),
         body: Row(
           children: <Widget>[
             SingleChildScrollView(
@@ -202,7 +238,7 @@ class _MainScreenState extends State<MainScreen> {
                     ? Container()
                     : IntrinsicHeight(
                         child: NavigationRail(
-                          elevation: 0.99,
+                          // elevation: 0.99,
                           groupAlignment: 0,
                           backgroundColor: kSidebarColor,
                           selectedIndex: _selectedIndex,

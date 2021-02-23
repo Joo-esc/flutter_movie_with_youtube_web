@@ -213,16 +213,6 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  print(controller.movieList[0].id);
-                                },
-                                child: Container(
-                                  color: Colors.red,
-                                  width: 100,
-                                  height: 50,
-                                ),
-                              ),
                               Text(
                                 selectedType == 0
                                     ? controller
@@ -506,7 +496,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                                           .peopleList[index]
                                                           .name,
                                                       style: TextStyle(
-                                                          fontSize: 16,
+                                                          fontSize: 12,
                                                           color: Colors.white),
                                                     )
                                                   ],
