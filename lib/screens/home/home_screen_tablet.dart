@@ -22,7 +22,7 @@ class HomeScreenTablet extends StatefulWidget {
 }
 
 class _HomeScreenTabletState extends State<HomeScreenTablet> {
-  //Youtube controller
+  //Youtube controllerr
   YoutubePlayerController _controller;
   int kHeaderFontSize;
   final ItemScrollController itemScrollController = ItemScrollController();

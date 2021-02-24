@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:group_button/group_button.dart';
 import 'package:moview_web/api.dart';
+import 'package:moview_web/controller/google_sign_in_controller.dart';
 import 'package:moview_web/controller/movie_controller.dart';
 import 'package:moview_web/controller/youtube_controller.dart';
 import 'package:moview_web/model/movie_model.dart';
@@ -18,7 +19,6 @@ import 'package:moview_web/model/people.dart';
 import 'package:moview_web/model/recommend_moive.dart';
 import 'package:moview_web/model/youtube.dart';
 import 'package:moview_web/utill/default.dart';
-
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sizer/sizer.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
@@ -33,6 +33,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   int selectedType = 0;
   bool sectionChange = true;
   YoutubePlayerController _controller;
+  final loginController = Get.put(GoogleSignInController());
   final controller = Get.put(MovieController());
   final youController = Get.put(YoutubeController());
   final ItemScrollController itemScrollController = ItemScrollController();
@@ -45,6 +46,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
   void initState() {
     YoutubePlayerController _controller;
     final controller = Get.put(MovieController());
+
     controller.getMovies(controller);
     controller.getRecommendMovie(controller);
     Future.delayed(Duration.zero, () async {
@@ -120,18 +122,30 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                       child: Stack(
                     children: [
                       Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(selectedType == 0
-                                ? 'https://image.tmdb.org/t/p/original' +
-                                    controller
-                                        .movieList[controller.count.value].image
-                                : controller
-                                    .recommendList[controller.count.value]
-                                    .image),
-                            fit: BoxFit.cover,
-                          ),
+                        width: double.infinity,
+                        child: CachedNetworkImage(
+                          imageUrl: selectedType == 0
+                              ? 'https://image.tmdb.org/t/p/original' +
+                                  controller
+                                      .movieList[controller.count.value].image
+                              : controller
+                                  .recommendList[controller.count.value].image,
+                          fit: BoxFit.cover,
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                         ),
+                        // decoration: BoxDecoration(
+                        //   image: DecorationImage(
+                        //     image: NetworkImage(selectedType == 0
+                        //         ? 'https://image.tmdb.org/t/p/original' +
+                        //             controller
+                        //                 .movieList[controller.count.value].image
+                        //         : controller
+                        //             .recommendList[controller.count.value]
+                        //             .image),
+                        //     fit: BoxFit.cover,
+                        //   ),
+                        // ),
                       ),
                       Container(
                         width: double.infinity,
@@ -372,7 +386,8 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                                       SizedBox(width: 5),
                                                       GestureDetector(
                                                         onTap: () {
-                                                          print('hi');
+                                                          loginController
+                                                              .logout();
                                                         },
                                                         child: Text(
                                                           '예고편',
@@ -408,7 +423,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                                     children: [
                                                       Icon(
                                                         Icons
-                                                            .play_circle_outline,
+                                                            .favorite_outline_outlined,
                                                         color: Colors.white,
                                                         size: 18,
                                                       ),
@@ -434,79 +449,7 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                         ],
                                       ),
                                     )
-                                  //TODO ALL about textform field & all about cast
-                                  : Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            print(MediaQuery.of(context)
-                                                .size
-                                                .width);
-                                          },
-                                          child: Text(
-                                            '출연진',
-                                            style: TextStyle(
-                                              fontSize: 30,
-                                              color:
-                                                  Colors.white.withOpacity(0.8),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 20),
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                      .size
-                                                      .width >
-                                                  1100
-                                              ? 58.0.h
-                                              : 30.0.h,
-                                          height: 200,
-                                          child: ListView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount:
-                                                controller.movieList.length,
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              return Container(
-                                                padding:
-                                                    EdgeInsets.only(right: 10),
-                                                child: Column(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      radius: 13.0.sp,
-                                                      backgroundImage: controller
-                                                                  .peopleList[
-                                                                      index]
-                                                                  .profileImage ==
-                                                              null
-                                                          ? NetworkImage(
-                                                              'https://firebasestorage.googleapis.com/v0/b/movie-web-f970c.appspot.com/o/movies%2Fnoneprofile.png?alt=media&token=a5d38773-adc3-4580-87fd-244f246a97ba')
-                                                          : NetworkImage(
-                                                              'https://image.tmdb.org/t/p/original/' +
-                                                                  controller
-                                                                      .peopleList[
-                                                                          index]
-                                                                      .profileImage),
-                                                    ),
-                                                    SizedBox(height: 6),
-                                                    Text(
-                                                      controller
-                                                          .peopleList[index]
-                                                          .name,
-                                                      style: TextStyle(
-                                                          fontSize: 12,
-                                                          color: Colors.white),
-                                                    )
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                  : CastWidget(context),
                             ],
                           ),
                         ],
@@ -572,31 +515,32 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
                                     controller.peopleList = _peopleLista;
                                   });
                                 },
-                                // onDoubleTap: () {
-                                //   print(controller.selectedId);
-                                //   setState(() {
-                                //     sectionChange = false;
-                                //   });
-                                //   controller.count.value = index;
-                                //   itemScrollController.scrollTo(
-                                //       index: controller.count.value,
-                                //       duration: Duration(seconds: 1),
-                                //       curve: Curves.easeInOutCubic);
-                                //   // youtube detial
-                                //   controller.selectedTitle = controller
-                                //       .movieList[controller.count.value ?? 0]
-                                //       .title;
-                                // },
                                 child: Container(
                                   margin: EdgeInsets.only(right: 20),
                                   width: 236,
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(15),
-                                    child: Image.network(selectedType == 0
-                                        ? 'https://image.tmdb.org/t/p/original/' +
-                                            controller.movieList[index].image
-                                        : controller
-                                            .recommendList[index].image),
+                                    child: CachedNetworkImage(
+                                      imageUrl: selectedType == 0
+                                          ? 'https://image.tmdb.org/t/p/original/' +
+                                              controller.movieList[index].image
+                                          : controller
+                                              .recommendList[index].image,
+                                      progressIndicatorBuilder:
+                                          (context, url, downloadProgress) =>
+                                              Center(
+                                        child: CircularProgressIndicator(
+                                            value: downloadProgress.progress),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                    ),
+
+                                    // Image.network(selectedType == 0
+                                    //     ? 'https://image.tmdb.org/t/p/original/' +
+                                    //         controller.movieList[index].image
+                                    //     : controller
+                                    //         .recommendList[index].image),
                                   ),
                                 ),
                               );
@@ -610,6 +554,61 @@ class _HomeScreenDesktopState extends State<HomeScreenDesktop> {
         );
       });
     });
+  }
+
+  //TODO ALL about textform field & all about cast
+  Column CastWidget(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () {
+            print(MediaQuery.of(context).size.width);
+          },
+          child: Text(
+            '출연진',
+            style: TextStyle(
+              fontSize: 30,
+              color: Colors.white.withOpacity(0.8),
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Container(
+          width: MediaQuery.of(context).size.width > 1100 ? 58.0.h : 30.0.h,
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: controller.movieList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Container(
+                padding: EdgeInsets.only(right: 10),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 13.0.sp,
+                      backgroundImage: controller
+                                  .peopleList[index].profileImage ==
+                              null
+                          ? NetworkImage(
+                              'https://firebasestorage.googleapis.com/v0/b/movie-web-f970c.appspot.com/o/movies%2Fnoneprofile.png?alt=media&token=a5d38773-adc3-4580-87fd-244f246a97ba')
+                          : NetworkImage(
+                              'https://image.tmdb.org/t/p/original/' +
+                                  controller.peopleList[index].profileImage),
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      controller.peopleList[index].name,
+                      style: TextStyle(fontSize: 12, color: Colors.white),
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 
   // TODO SectionChange (From Youtube API with review wheel)

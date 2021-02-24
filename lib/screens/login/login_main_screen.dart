@@ -6,8 +6,11 @@ import 'package:moview_web/controller/google_sign_in_controller.dart';
 import 'package:moview_web/main.dart';
 
 class LoginMain extends StatelessWidget {
+  static String id = '/LoginMain';
   @override
   Widget build(BuildContext context) {
+    // Get.toNamed("/LoginMain");
+
     final loginController = Get.put(GoogleSignInController());
     return StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -15,6 +18,7 @@ class LoginMain extends StatelessWidget {
           if (loginController.isSignIn) {
             return CircularProgressIndicator();
           } else if (snapshot.hasData) {
+            // Get.offAllNamed("/MyApp");
             return MainScreen();
           } else {
             return Scaffold(

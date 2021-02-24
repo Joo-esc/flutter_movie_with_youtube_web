@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -5,11 +6,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:moview_web/screens/home/home_screen.dart';
+import 'package:moview_web/screens/home/home_screen_desktop.dart';
+import 'package:moview_web/screens/mypage/mypage_screen.dart';
 import 'package:moview_web/utill/default.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:flutter/services.dart';
 import 'screens/login/login_main_screen.dart';
 
+// flutter run -d chrome --web-hostname localhost --web-port 5000
 GoogleSignIn _googleSignIn = GoogleSignIn(
   scopes: [
     'email',
@@ -23,10 +27,17 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final _user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      getPages: [
+        GetPage(name: '/', page: () => MainScreen()),
+        GetPage(name: '/LoginMain', page: () => LoginMain()),
+        GetPage(name: '/HomeScreen', page: () => HomeScreen()),
+        GetPage(name: '/HomeScreenDesktop', page: () => HomeScreenDesktop()),
+        GetPage(name: '/MyProfile', page: () => MyPage()),
+      ],
       debugShowCheckedModeBanner: false,
       title: 'Sub Project',
       theme: ThemeData(
@@ -34,7 +45,10 @@ class MyApp extends StatelessWidget {
           color: Colors.black,
         ),
       ),
-      home: MainScreen(), //TODO After login screen use MainScreen
+      //TODO After login screen use MainScreen
+      home: LoginMain(),
+
+      // initialRoute: '/',
     );
   }
 }
@@ -57,6 +71,8 @@ class _MainScreenState extends State<MainScreen> {
     _selectedIndex = 0;
     _pageController =
         PageController(initialPage: _selectedIndex, keepPage: true);
+    //GetX Set URL Routes
+
     super.initState();
   }
 
@@ -64,6 +80,10 @@ class _MainScreenState extends State<MainScreen> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void route() {
+    Get.toNamed('MyScreen');
   }
 
   @override
@@ -363,11 +383,8 @@ class _MainScreenState extends State<MainScreen> {
                     color: Colors.amber,
                   ),
                 ),
-                Scaffold(
-                  body: Container(
-                    color: Colors.indigo,
-                  ),
-                )
+                MyPage(),
+                // Get.toNamed('MyPage'),
               ],
             ))
           ],

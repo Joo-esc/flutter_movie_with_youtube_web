@@ -29,7 +29,8 @@ class _HomeScreenMobileState extends State<HomeScreenMobile> {
           ),
           Text(
             '개발자 추천',
-            style: TextStyle(color: Colors.white, fontSize: 22),
+            style: TextStyle(
+                color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
           ),
           SizedBox(
             height: 10,
@@ -41,13 +42,11 @@ class _HomeScreenMobileState extends State<HomeScreenMobile> {
               scrollDirection: Axis.horizontal,
               itemBuilder: (BuildContext context, int index) {
                 return ClipRRect(
-                  child: Container(
-                    margin: EdgeInsets.only(right: 12),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    'https://firebasestorage.googleapis.com/v0/b/movie-web-f970c.appspot.com/o/movies%2Fmoviepost4.jpg?alt=media&token=72609078-4921-47ec-93cb-2adefa2d3905',
                     height: 220,
                     width: 146,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(13)),
                   ),
                 );
                 Container(
